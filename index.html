@@ -6,1909 +6,609 @@
 
   <title>HD Project Hub | 사내 프로젝트</title>
 
-  <!-- Nanum Gothic -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap"
-    rel="stylesheet"
-  >
+  <!-- =====================================================
+       GOOGLE FONT
+       궁서체를 기본으로 사용하되,
+       시스템에 궁서체가 없을 경우 바탕체/serif로 대체
+  ====================================================== -->
+  <style>
+    /* =====================================================
+       COLOR SYSTEM
+    ====================================================== */
 
- <style>
-/* =========================================================
-   HD PROJECT HUB
-   YELLOW / MINT EDITION
-   ---------------------------------------------------------
-   Main Pastel Yellow : #FFF4B8
-   Canary Yellow      : #F6C900
-   Mint Point         : #66D7B5
-   Cream Background   : #FFFDF4
-   Dark Brown         : #40351F
-   ========================================================= */
+    :root {
+      --pastel-yellow: #FFF4B8;
+      --pastel-yellow-2: #FFF9D9;
 
+      --canary-yellow: #F6C900;
+      --canary-dark: #D9AD00;
 
-/* =========================================================
-   COLOR SYSTEM
-   ========================================================= */
+      --mint: #65D6B2;
+      --mint-light: #D8F7EC;
+      --mint-dark: #35A98A;
 
-:root {
+      --cream: #FFFDF4;
+      --white: #FFFFFF;
 
-  --pastel-yellow: #FFF4B8;
+      --brown: #40351F;
+      --brown-2: #5C4E32;
+      --brown-light: #82775E;
 
-  --canary: #F6C900;
-  --canary-light: #FFE56B;
+      --line: #E9DEAC;
 
-  --mint: #66D7B5;
-  --mint-light: #C9F5E7;
+      --shadow:
+        0 18px 50px rgba(74, 61, 24, 0.10);
 
-  --cream: #FFFDF4;
+      --shadow-hover:
+        0 25px 60px rgba(74, 61, 24, 0.16);
 
-  --brown: #40351F;
-  --brown-light: #75684D;
+      --radius: 20px;
+    }
 
-  --white: #FFFFFF;
 
-  --line: #EBDFAE;
+    /* =====================================================
+       RESET
+    ====================================================== */
 
-  --shadow:
-    0 18px 45px
-    rgba(78, 62, 17, .10);
+    * {
+      box-sizing: border-box;
+    }
 
-  --radius: 20px;
-}
+    html {
+      scroll-behavior: smooth;
+    }
 
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--brown);
 
-/* =========================================================
-   RESET
-   ========================================================= */
+      font-family:
+        "궁서",
+        "Gungsuh",
+        "Batang",
+        "바탕",
+        serif;
 
-* {
-  box-sizing: border-box;
-}
+      line-height: 1.7;
+    }
 
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-html {
-  scroll-behavior: smooth;
-}
+    button,
+    input,
+    textarea {
+      font-family: inherit;
+    }
 
+    button {
+      cursor: pointer;
+    }
 
-body {
 
-  margin: 0;
+    /* =====================================================
+       HEADER
+    ====================================================== */
 
-  background:
-    var(--cream);
+    .header {
+      position: fixed;
+      z-index: 1000;
 
-  color:
-    var(--brown);
+      top: 0;
+      left: 0;
 
-  /*
-    궁서체 기반
-  */
+      width: 100%;
+      height: 74px;
 
-  font-family:
-    "궁서",
-    "Gungsuh",
-    "Batang",
-    "바탕",
-    serif;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-  line-height: 1.7;
-}
+      padding: 0 5vw;
 
+      background:
+        rgba(255, 253, 244, 0.90);
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
+      border-bottom:
+        1px solid rgba(246, 201, 0, 0.25);
 
+      backdrop-filter: blur(15px);
+    }
 
-button,
-input,
-textarea {
-  font-family: inherit;
-}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
 
+      font-size: 16px;
+      font-weight: bold;
 
-button {
-  cursor: pointer;
-}
+      white-space: nowrap;
+    }
 
+    .logo-mark {
+      width: 40px;
+      height: 40px;
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+      display: grid;
+      place-items: center;
 
-.header {
+      background: var(--canary-yellow);
 
-  position: fixed;
+      color: var(--brown);
 
-  z-index: 100;
+      border-radius: 12px;
 
-  top: 0;
-  left: 0;
+      box-shadow:
+        4px 4px 0 var(--mint);
 
-  width: 100%;
-  height: 74px;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
-  display: flex;
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-  align-items: center;
+    .nav a {
+      padding: 9px 13px;
 
-  justify-content:
-    space-between;
+      color: var(--brown-2);
 
-  padding:
-    0 5vw;
+      border-radius: 10px;
 
-  color:
-    var(--brown);
+      font-size: 13px;
 
-  background:
-    rgba(255, 253, 244, .88);
+      transition: all 0.2s ease;
+    }
 
-  border-bottom:
-    1px solid
-    rgba(246, 201, 0, .22);
+    .nav a:hover {
+      background: var(--pastel-yellow);
+      color: var(--brown);
+    }
 
-  backdrop-filter:
-    blur(15px);
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-}
+      font-size: 11px;
+      white-space: nowrap;
+    }
 
+    .user-dot {
+      width: 8px;
+      height: 8px;
 
-/* Logo */
+      border-radius: 50%;
 
-.logo {
+      background: #C6BDA6;
+    }
 
-  display: flex;
+    .user-dot.on {
+      background: var(--mint);
 
-  align-items: center;
+      box-shadow:
+        0 0 10px rgba(101, 214, 178, 0.8);
+    }
 
-  gap: 11px;
 
-  font-size: 15px;
+    /* =====================================================
+       HERO
+    ====================================================== */
 
-  font-weight: 900;
+    .hero {
+      position: relative;
 
-  letter-spacing: -1px;
-}
+      min-height: 750px;
 
+      display: flex;
+      align-items: center;
 
-.logo-mark {
+      overflow: hidden;
 
-  width: 40px;
-  height: 40px;
+      background:
 
-  display: grid;
+        radial-gradient(
+          circle at 82% 20%,
+          rgba(246, 201, 0, 0.34),
+          transparent 33%
+        ),
 
-  place-items: center;
+        radial-gradient(
+          circle at 15% 80%,
+          rgba(101, 214, 178, 0.25),
+          transparent 32%
+        ),
 
-  border-radius: 12px;
+        linear-gradient(
+          135deg,
+          #FFFDF4 0%,
+          #FFF7C9 55%,
+          #FFEE96 100%
+        );
+    }
 
-  color:
-    var(--brown);
 
-  background:
-    var(--canary);
+    /* 움직이는 격자 */
 
-  box-shadow:
-    4px 4px 0
-    var(--mint);
+    .hero-grid {
+      position: absolute;
 
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
+      top: -150px;
+      left: -150px;
 
-  font-size: 14px;
+      width: calc(100% + 300px);
+      height: calc(100% + 300px);
 
-  font-weight: bold;
-}
+      opacity: 0.25;
 
+      background-image:
 
-/* Navigation */
+        linear-gradient(
+          rgba(64, 53, 31, 0.10) 1px,
+          transparent 1px
+        ),
 
-.nav {
+        linear-gradient(
+          90deg,
+          rgba(64, 53, 31, 0.10) 1px,
+          transparent 1px
+        );
 
-  display: flex;
+      background-size: 60px 60px;
 
-  gap: 5px;
-}
+      transform:
+        perspective(500px)
+        rotateX(58deg)
+        translateY(80px)
+        scale(1.5);
 
+      animation:
+        gridMove 18s linear infinite;
+    }
 
-.nav a {
+    @keyframes gridMove {
+      from {
+        background-position: 0 0;
+      }
 
-  padding:
-    8px 12px;
+      to {
+        background-position: 60px 60px;
+      }
+    }
 
-  border-radius: 10px;
 
-  color:
-    var(--brown-light);
+    /* 움직이는 원 */
 
-  font-size: 13px;
+    .hero-orb {
+      position: absolute;
 
-  transition:
-    .2s ease;
-}
+      border-radius: 50%;
 
+      pointer-events: none;
+    }
 
-.nav a:hover {
+    .orb-yellow {
+      width: 380px;
+      height: 380px;
 
-  color:
-    var(--brown);
+      right: 4%;
+      top: 10%;
 
-  background:
-    var(--pastel-yellow);
+      background:
+        radial-gradient(
+          circle,
+          rgba(246, 201, 0, 0.32),
+          rgba(246, 201, 0, 0.05) 55%,
+          transparent 72%
+        );
 
-}
+      animation:
+        yellowFloat 8s ease-in-out infinite;
+    }
 
+    .orb-mint {
+      width: 310px;
+      height: 310px;
 
-/* User */
+      left: 3%;
+      bottom: 3%;
 
-.header-user {
+      background:
+        radial-gradient(
+          circle,
+          rgba(101, 214, 178, 0.28),
+          transparent 70%
+        );
 
-  display: flex;
+      animation:
+        mintFloat 10s ease-in-out infinite;
+    }
 
-  align-items: center;
+    @keyframes yellowFloat {
+      0%,
+      100% {
+        transform:
+          translate(0, 0)
+          scale(1);
+      }
 
-  gap: 9px;
+      50% {
+        transform:
+          translate(-35px, 30px)
+          scale(1.12);
+      }
+    }
 
-  font-size: 11px;
-}
+    @keyframes mintFloat {
+      0%,
+      100% {
+        transform:
+          translate(0, 0);
+      }
 
+      50% {
+        transform:
+          translate(40px, -30px);
+      }
+    }
 
-.user-dot {
 
-  width: 8px;
-  height: 8px;
+    /* Hero content */
 
-  border-radius: 50%;
-
-  background:
-    #C8BFA7;
-}
-
-
-.user-dot.on {
-
-  background:
-    var(--mint);
-
-  box-shadow:
-    0 0 12px
-    rgba(102,215,181,.8);
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.hero {
-
-  min-height: 720px;
-
-  position: relative;
-
-  overflow: hidden;
-
-  display: flex;
-
-  align-items: center;
-
-  color:
-    var(--brown);
-
-  background:
-
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(246,201,0,.35),
-      transparent 35%
-    ),
-
-    radial-gradient(
-      circle at 15% 80%,
-      rgba(102,215,181,.22),
-      transparent 32%
-    ),
-
-    linear-gradient(
-      135deg,
-      #FFFDF4 0%,
-      #FFF7C9 55%,
-      #FFF1A3 100%
-    );
-
-}
-
-
-/* =========================================================
-   HERO GRID
-   ========================================================= */
-
-.hero-grid {
-
-  position: absolute;
-
-  inset: -100px;
-
-  opacity: .25;
-
-  background-image:
-
-    linear-gradient(
-      rgba(64,53,31,.10) 1px,
-      transparent 1px
-    ),
-
-    linear-gradient(
-      90deg,
-      rgba(64,53,31,.10) 1px,
-      transparent 1px
-    );
-
-  background-size:
-    60px 60px;
-
-  transform:
-    perspective(500px)
-    rotateX(58deg)
-    translateY(80px)
-    scale(1.5);
-
-  transform-origin:
-    center;
-
-  animation:
-    gridMove 18s linear infinite;
-
-}
-
-
-@keyframes gridMove {
-
-  from {
-    background-position:
-      0 0;
-  }
-
-  to {
-    background-position:
-      60px 60px;
-  }
-
-}
-
-
-/* =========================================================
-   HERO ORBS
-   ========================================================= */
-
-.orb {
-
-  position: absolute;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-
-}
-
-
-.orb.one {
-
-  width: 360px;
-  height: 360px;
-
-  right: 5%;
-  top: 12%;
-
-  background:
-
-    radial-gradient(
-      circle,
-      rgba(246,201,0,.38),
-      rgba(246,201,0,.05) 55%,
-      transparent 70%
-    );
-
-  animation:
-    floatOne 7s ease-in-out infinite;
-
-}
-
-
-.orb.two {
-
-  width: 300px;
-  height: 300px;
-
-  left: 4%;
-  bottom: 5%;
-
-  background:
-
-    radial-gradient(
-      circle,
-      rgba(102,215,181,.28),
-      transparent 70%
-    );
-
-  animation:
-    floatTwo 9s ease-in-out infinite;
-
-}
-
-
-@keyframes floatOne {
-
-  0%,
-  100% {
-
-    transform:
-      translate(0,0)
-      scale(1);
-
-  }
-
-  50% {
-
-    transform:
-      translate(-40px,35px)
-      scale(1.12);
-
-  }
-
-}
-
-
-@keyframes floatTwo {
-
-  0%,
-  100% {
-
-    transform:
-      translate(0,0);
-
-  }
-
-  50% {
-
-    transform:
-      translate(45px,-30px);
-
-  }
-
-}
-
-
-/* =========================================================
-   HERO CONTENT
-   ========================================================= */
-
-.hero-content {
-
-  position: relative;
-
-  z-index: 2;
-
-  width:
-    min(1180px,90%);
-
-  margin:
-    0 auto;
-
-  padding-top:
-    60px;
-
-}
-
-
-.eyebrow {
-
-  display:
-    inline-flex;
-
-  align-items:
-    center;
-
-  gap: 8px;
-
-  padding:
-    7px 12px;
-
-  color:
-    var(--brown);
-
-  background:
-    rgba(255,255,255,.45);
-
-  border:
-    1px solid
-    rgba(246,201,0,.55);
-
-  border-radius:
-    999px;
-
-  font-size:
-    11px;
-
-  letter-spacing:
-    1px;
-
-}
-
-
-.eyebrow i {
-
-  width: 8px;
-  height: 8px;
-
-  border-radius: 50%;
-
-  background:
-    var(--mint);
-
-  box-shadow:
-    0 0 10px
-    rgba(102,215,181,.8);
-
-}
-
-
-/* HERO TITLE */
-
-.hero h1 {
-
-  max-width:
-    850px;
-
-  margin:
-    23px 0 16px;
-
-  color:
-    var(--brown);
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    "Batang",
-    serif;
-
-  font-size:
-    clamp(42px,6vw,78px);
-
-  line-height:
-    1.08;
-
-  letter-spacing:
-    -4px;
-
-}
-
-
-.hero h1 em {
-
-  color:
-    var(--canary);
-
-  font-style:
-    normal;
-
-  text-shadow:
-    2px 2px 0
-    rgba(64,53,31,.12);
-
-}
-
-
-/* HERO DESCRIPTION */
-
-.hero-description {
-
-  max-width:
-    680px;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    15px;
-
-}
-
-
-/* =========================================================
-   BUTTON
-   ========================================================= */
-
-.hero-buttons {
-
-  display:
-    flex;
-
-  flex-wrap:
-    wrap;
-
-  gap:
-    10px;
-
-  margin-top:
-    28px;
-
-}
-
-
-.btn {
-
-  border:
-    0;
-
-  border-radius:
-    11px;
-
-  padding:
-    12px 18px;
-
-  font-size:
-    12px;
-
-  font-weight:
-    900;
-
-  transition:
-    .2s ease;
-
-}
-
-
-/* Main */
-
-.btn-primary {
-
-  color:
-    var(--brown);
-
-  background:
-    var(--canary);
-
-  box-shadow:
-    4px 4px 0
-    rgba(102,215,181,.75);
-
-}
-
-
-.btn-primary:hover {
-
-  transform:
-    translateY(-3px);
-
-  box-shadow:
-    6px 7px 0
-    rgba(102,215,181,.75);
-
-}
-
-
-/* Outline */
-
-.btn-outline {
-
-  color:
-    var(--brown);
-
-  background:
-    rgba(255,255,255,.55);
-
-  border:
-    1px solid
-    rgba(64,53,31,.16);
-
-}
-
-
-.btn-outline:hover {
-
-  background:
-    var(--mint-light);
-
-  border-color:
-    var(--mint);
-
-}
-
-
-/* =========================================================
-   HERO STATS
-   ========================================================= */
-
-.hero-stats {
-
-  display:
-    flex;
-
-  gap:
-    38px;
-
-  margin-top:
-    52px;
-
-}
-
-
-.stat strong {
-
-  display:
-    block;
-
-  color:
-    var(--brown);
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    27px;
-
-}
-
-
-.stat span {
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    10px;
-
-  letter-spacing:
-    .7px;
-
-}
-
-
-/* =========================================================
-   MAIN
-   ========================================================= */
-
-.container {
-
-  width:
-    min(1180px,90%);
-
-  margin:
-    0 auto;
-
-}
-
-
-.section {
-
-  padding:
-    85px 0;
-
-}
-
-
-/* =========================================================
-   SECTION HEADER
-   ========================================================= */
-
-.section-head {
-
-  margin-bottom:
-    25px;
-
-}
-
-
-.section-head small {
-
-  color:
-    var(--canary);
-
-  font-size:
-    12px;
-
-  font-weight:
-    900;
-
-  letter-spacing:
-    1.5px;
-
-}
-
-
-.section-head h2 {
-
-  margin:
-    5px 0;
-
-  color:
-    var(--brown);
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    34px;
-
-  letter-spacing:
-    -2px;
-
-}
-
-
-.section-head p {
-
-  margin:
-    0;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    13px;
-
-}
-
-
-/* =========================================================
-   BOARD GRID
-   ========================================================= */
-
-.board-grid {
-
-  display:
-    grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
-  gap:
-    15px;
-
-}
-
-
-.board-card {
-
-  position:
-    relative;
-
-  overflow:
-    hidden;
-
-  min-height:
-    240px;
-
-  padding:
-    23px;
-
-  background:
-    var(--white);
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:
-    var(--radius);
-
-  box-shadow:
-    var(--shadow);
-
-  transition:
-    .25s ease;
-
-}
-
-
-.board-card::before {
-
-  content:
-    "";
-
-  position:
-    absolute;
-
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 5px;
-
-  background:
-    var(--canary);
-
-}
-
-
-.board-card:nth-child(2)::before {
-
-  background:
-    var(--mint);
-
-}
-
-
-.board-card:nth-child(3)::before {
-
-  background:
-    var(--canary-light);
-
-}
-
-
-.board-card:nth-child(4)::before {
-
-  background:
-    var(--mint);
-
-}
-
-
-.board-card:hover {
-
-  transform:
-    translateY(-7px);
-
-  box-shadow:
-    0 25px 55px
-    rgba(78,62,17,.14);
-
-}
-
-
-/* NUMBER */
-
-.board-number {
-
-  color:
-    #A89A6D;
-
-  font-size:
-    10px;
-
-  font-weight:
-    900;
-
-}
-
-
-/* ICON */
-
-.board-icon {
-
-  width:
-    47px;
-
-  height:
-    47px;
-
-  display:
-    grid;
-
-  place-items:
-    center;
-
-  margin:
-    17px 0;
-
-  color:
-    var(--brown);
-
-  background:
-    var(--canary);
-
-  border-radius:
-    13px;
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    17px;
-
-  font-weight:
-    900;
-
-  box-shadow:
-    4px 4px 0
-    var(--mint);
-
-}
-
-
-.board-card:nth-child(2)
-.board-icon {
-
-  background:
-    var(--mint);
-
-}
-
-
-.board-card:nth-child(3)
-.board-icon {
-
-  background:
-    var(--pastel-yellow);
-
-}
-
-
-.board-card:nth-child(4)
-.board-icon {
-
-  background:
-    var(--mint-light);
-
-}
-
-
-.board-card h3 {
-
-  margin:
-    0 0 5px;
-
-  color:
-    var(--brown);
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    19px;
-
-}
-
-
-.board-card p {
-
-  margin:
-    0;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    11px;
-
-}
-
-
-.board-link {
-
-  position:
-    absolute;
-
-  right:
-    20px;
-
-  bottom:
-    19px;
-
-  color:
-    var(--brown);
-
-  font-size:
-    11px;
-
-  font-weight:
-    900;
-
-}
-
-
-/* =========================================================
-   PARTICIPATE
-   ========================================================= */
-
-.participate {
-
-  display:
-    grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:
-    18px;
-
-}
-
-
-.panel {
-
-  padding:
-    30px;
-
-  background:
-    var(--white);
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:
-    var(--radius);
-
-  box-shadow:
-    var(--shadow);
-
-}
-
-
-.panel.dark {
-
-  color:
-    var(--brown);
-
-  background:
-
-    linear-gradient(
-      135deg,
-      var(--pastel-yellow),
-      #FFF8D8
-    );
-
-  border:
-    1px solid
-    var(--line);
-
-}
-
-
-.panel h2 {
-
-  margin:
-    10px 0;
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    29px;
-
-}
-
-
-.steps {
-
-  display:
-    grid;
-
-  gap:
-    17px;
-
-  margin-top:
-    20px;
-
-}
-
-
-.step {
-
-  display:
-    grid;
-
-  grid-template-columns:
-    36px 1fr;
-
-  gap:
-    12px;
-
-}
-
-
-.step-no {
-
-  width:
-    32px;
-
-  height:
-    32px;
-
-  display:
-    grid;
-
-  place-items:
-    center;
-
-  color:
-    var(--brown);
-
-  background:
-    var(--mint);
-
-  border-radius:
-    9px;
-
-  font-size:
-    11px;
-
-  font-weight:
-    900;
-
-}
-
-
-.step strong {
-
-  display:
-    block;
-
-  font-size:
-    13px;
-
-}
-
-
-.step span {
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    11px;
-
-}
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-.status-box {
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    space-between;
-
-  gap:
-    20px;
-
-  padding:
-    16px 18px;
-
-  margin-top:
-    18px;
-
-  background:
-    #FFFDF4;
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:
-    13px;
-
-}
-
-
-.status-left {
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  gap:
-    9px;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    11px;
-
-}
-
-
-.status-indicator {
-
-  width:
-    8px;
-
-  height:
-    8px;
-
-  border-radius:
-    50%;
-
-  background:
-    #C8BFA7;
-
-}
-
-
-.status-indicator.ok {
-
-  background:
-    var(--mint);
-
-  box-shadow:
-    0 0 10px
-    rgba(102,215,181,.7);
-
-}
-
-
-/* =========================================================
-   CTA
-   ========================================================= */
-
-.cta {
-
-  position:
-    relative;
-
-  overflow:
-    hidden;
-
-  padding:
-    55px 45px;
-
-  color:
-    var(--brown);
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:
-    25px;
-
-  background:
-
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(102,215,181,.28),
-      transparent 30%
-    ),
-
-    linear-gradient(
-      135deg,
-      var(--pastel-yellow),
-      #FFF9DC
-    );
-
-  box-shadow:
-    var(--shadow);
-
-}
-
-
-.cta::after {
-
-  content:
-    "";
-
-  position:
-    absolute;
-
-  right:
-    -100px;
-
-  bottom:
-    -100px;
-
-  width:
-    260px;
-
-  height:
-    260px;
-
-  border-radius:
-    50%;
-
-  background:
-    var(--mint);
-
-  opacity:
-    .18;
-
-}
-
-
-.cta h2 {
-
-  position:
-    relative;
-
-  z-index:
-    2;
-
-  max-width:
-    700px;
-
-  margin:
-    0 0 8px;
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    34px;
-
-  letter-spacing:
-    -2px;
-
-}
-
-
-.cta p {
-
-  position:
-    relative;
-
-  z-index:
-    2;
-
-  max-width:
-    650px;
-
-  margin:
-    0;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    12px;
-
-}
-
-
-/* =========================================================
-   MODAL
-   ========================================================= */
-
-.modal {
-
-  position:
-    fixed;
-
-  z-index:
-    300;
-
-  inset:
-    0;
-
-  display:
-    none;
-
-  place-items:
-    center;
-
-  padding:
-    20px;
-
-  background:
-    rgba(64,53,31,.42);
-
-  backdrop-filter:
-    blur(8px);
-
-}
-
-
-.modal.show {
-
-  display:
-    grid;
-
-}
-
-
-.modal-card {
-
-  width:
-    min(430px,100%);
-
-  padding:
-    30px;
-
-  background:
-    var(--cream);
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:
-    20px;
-
-  box-shadow:
-    0 25px 80px
-    rgba(64,53,31,.25);
-
-  animation:
-    modalIn .25s ease;
-
-}
-
-
-@keyframes modalIn {
-
-  from {
-
-    opacity:
-      0;
-
-    transform:
-      translateY(12px)
-      scale(.98);
-
-  }
-
-  to {
-
-    opacity:
-      1;
-
-    transform:
-      translateY(0)
-      scale(1);
-
-  }
-
-}
-
-
-.modal-head {
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    space-between;
-
-}
-
-
-.modal-head h3 {
-
-  margin:
-    0;
-
-  font-family:
-    "궁서",
-    "Gungsuh",
-    serif;
-
-  font-size:
-    22px;
-
-}
-
-
-.close {
-
-  border:
-    0;
-
-  background:
-    transparent;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    24px;
-
-}
-
-
-/* =========================================================
-   FORM
-   ========================================================= */
-
-.form-group {
-
-  margin-top:
-    14px;
-
-}
-
-
-.form-group label {
-
-  display:
-    block;
-
-  margin-bottom:
-    5px;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    11px;
-
-  font-weight:
-    900;
-
-}
-
-
-.form-group input {
-
-  width:
-    100%;
-
-  padding:
-    12px 13px;
-
-  color:
-    var(--brown);
-
-  background:
-    white;
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:
-    10px;
-
-  outline:
-    none;
-
-  font-size:
-    12px;
-
-}
-
-
-.form-group input:focus {
-
-  border-color:
-    var(--mint);
-
-  box-shadow:
-    0 0 0 3px
-    rgba(102,215,181,.15);
-
-}
-
-
-.auth-message {
-
-  min-height:
-    18px;
-
-  margin-top:
-    10px;
-
-  color:
-    var(--brown-light);
-
-  font-size:
-    11px;
-
-}
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-footer {
-
-  padding:
-    35px 0 55px;
-
-  color:
-    var(--brown-light);
-
-  text-align:
-    center;
-
-  font-size:
-    10px;
-
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media (max-width:900px) {
-
-  .board-grid {
-
-    grid-template-columns:
-      repeat(2,1fr);
-
-  }
-
-
-  .participate {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .nav {
-
-    display:
-      none;
-
-  }
-
-}
-
-
-@media (max-width:560px) {
-
-  .hero {
-
-    min-height:
-      680px;
-
-  }
-
-
-  .hero h1 {
-
-    letter-spacing:
-      -2px;
-
-  }
-
-
-  .hero-stats {
-
-    gap:
-      20px;
-
-  }
-
-
-  .board-grid {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .section {
-
-    padding:
-      65px 0;
-
-  }
-
-
-  .cta {
-
-    padding:
-      35px 25px;
-
-  }
-
-}
-</style>
-
-    /* =========================================================
-       MAIN
-       ========================================================= */
-
-    .container {
+    .hero-content {
+      position: relative;
+      z-index: 5;
 
       width: min(1180px, 90%);
 
       margin: 0 auto;
+
+      padding-top: 70px;
     }
 
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
 
-    .section {
+      padding: 7px 13px;
 
-      padding: 85px 0;
-    }
+      border:
+        1px solid rgba(246, 201, 0, 0.55);
 
+      border-radius: 999px;
 
-    .section-head {
-
-      margin-bottom: 25px;
-    }
-
-
-    .section-head small {
-
-      color: var(--royal);
-
-      font-weight: 800;
+      background:
+        rgba(255, 255, 255, 0.48);
 
       font-size: 11px;
 
-      letter-spacing: 1.2px;
+      letter-spacing: 1px;
     }
 
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: var(--mint);
+
+      box-shadow:
+        0 0 10px rgba(101, 214, 178, 0.8);
+    }
+
+    .hero h1 {
+      max-width: 850px;
+
+      margin: 24px 0 18px;
+
+      font-size:
+        clamp(42px, 6vw, 78px);
+
+      line-height: 1.08;
+
+      letter-spacing: -4px;
+
+      font-weight: bold;
+    }
+
+    .hero h1 em {
+      color: var(--canary-yellow);
+
+      font-style: normal;
+
+      text-shadow:
+        2px 2px 0 rgba(64, 53, 31, 0.10);
+    }
+
+    .hero-description {
+      max-width: 700px;
+
+      color: var(--brown-light);
+
+      font-size: 15px;
+    }
+
+
+    /* =====================================================
+       BUTTONS
+    ====================================================== */
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+
+      gap: 10px;
+
+      margin-top: 28px;
+    }
+
+    .btn {
+      border: 0;
+
+      border-radius: 11px;
+
+      padding: 12px 18px;
+
+      font-size: 12px;
+
+      font-weight: bold;
+
+      transition:
+        all 0.2s ease;
+    }
+
+    .btn-primary {
+      color: var(--brown);
+
+      background:
+        var(--canary-yellow);
+
+      box-shadow:
+        4px 4px 0 var(--mint);
+    }
+
+    .btn-primary:hover {
+      transform:
+        translateY(-3px);
+
+      box-shadow:
+        6px 7px 0 var(--mint);
+    }
+
+    .btn-outline {
+      color: var(--brown);
+
+      background:
+        rgba(255, 255, 255, 0.55);
+
+      border:
+        1px solid rgba(64, 53, 31, 0.16);
+    }
+
+    .btn-outline:hover {
+      background:
+        var(--mint-light);
+
+      border-color:
+        var(--mint);
+    }
+
+
+    /* =====================================================
+       HERO STATS
+    ====================================================== */
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+
+      margin-top: 55px;
+    }
+
+    .stat strong {
+      display: block;
+
+      font-size: 28px;
+    }
+
+    .stat span {
+      display: block;
+
+      color: var(--brown-light);
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      font-size: 9px;
+
+      letter-spacing: 1px;
+    }
+
+
+    /* =====================================================
+       COMMON
+    ====================================================== */
+
+    .container {
+      width: min(1180px, 90%);
+      margin: 0 auto;
+    }
+
+    .section {
+      padding: 85px 0;
+    }
+
+    .section-head {
+      margin-bottom: 27px;
+    }
+
+    .section-head small {
+      color: var(--canary-dark);
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      font-size: 11px;
+
+      font-weight: bold;
+
+      letter-spacing: 1.5px;
+    }
 
     .section-head h2 {
+      margin: 7px 0;
 
-      margin: 6px 0;
+      font-size: 34px;
 
-      font-size: 31px;
-
-      letter-spacing: -1.5px;
+      letter-spacing: -2px;
     }
-
 
     .section-head p {
+      margin: 0;
 
-      color: var(--muted);
+      color: var(--brown-light);
 
       font-size: 13px;
-
-      margin: 0;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        BOARD CARDS
-       ========================================================= */
+    ====================================================== */
 
     .board-grid {
-
       display: grid;
 
       grid-template-columns:
         repeat(4, 1fr);
 
-      gap: 15px;
+      gap: 16px;
     }
 
-
     .board-card {
-
       position: relative;
+
+      min-height: 250px;
+
+      padding: 25px;
 
       overflow: hidden;
 
-      min-height: 235px;
-
-      padding: 23px;
-
-      background: white;
+      background: var(--white);
 
       border:
-        1px solid
-        var(--line);
+        1px solid var(--line);
 
       border-radius:
         var(--radius);
@@ -1916,117 +616,138 @@ footer {
       box-shadow:
         var(--shadow);
 
-      transition: .25s;
+      transition:
+        all 0.25s ease;
     }
 
-
-    .board-card:hover {
-
-      transform:
-        translateY(-5px);
-
-      border-color:
-        #BDD0F3;
-    }
-
-
-    .board-number {
-
-      color: #A2B0C4;
-
-      font-size: 10px;
-
-      font-weight: 800;
-    }
-
-
-    .board-icon {
-
-      width: 45px;
-      height: 45px;
-
-      display: grid;
-
-      place-items: center;
-
-      margin: 17px 0;
-
-      border-radius: 12px;
-
-      color: white;
-
-      background: var(--royal);
-
-      font-size: 12px;
-
-      font-weight: 800;
-    }
-
-
-    .board-card:nth-child(2)
-    .board-icon {
-
-      background:
-        var(--dark-2);
-    }
-
-
-    .board-card:nth-child(3)
-    .board-icon {
-
-      background:
-        #3472D9;
-    }
-
-
-    .board-card:nth-child(4)
-    .board-icon {
-
-      background:
-        #2E9D89;
-    }
-
-
-    .board-card h3 {
-
-      margin: 0 0 5px;
-
-      font-size: 16px;
-    }
-
-
-    .board-card p {
-
-      color: var(--muted);
-
-      font-size: 11px;
-
-      margin: 0;
-    }
-
-
-    .board-link {
+    .board-card::before {
+      content: "";
 
       position: absolute;
 
-      right: 20px;
+      top: 0;
+      left: 0;
 
+      width: 100%;
+      height: 5px;
+
+      background:
+        var(--canary-yellow);
+    }
+
+    .board-card:nth-child(2)::before {
+      background:
+        var(--mint);
+    }
+
+    .board-card:nth-child(3)::before {
+      background:
+        var(--canary-dark);
+    }
+
+    .board-card:nth-child(4)::before {
+      background:
+        var(--mint-dark);
+    }
+
+    .board-card:hover {
+      transform:
+        translateY(-7px);
+
+      box-shadow:
+        var(--shadow-hover);
+    }
+
+    .board-number {
+      color: #A49772;
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      font-size: 10px;
+
+      font-weight: bold;
+    }
+
+    .board-icon {
+      width: 48px;
+      height: 48px;
+
+      display: grid;
+      place-items: center;
+
+      margin: 18px 0;
+
+      color: var(--brown);
+
+      background:
+        var(--canary-yellow);
+
+      border-radius: 13px;
+
+      box-shadow:
+        4px 4px 0 var(--mint);
+
+      font-size: 18px;
+
+      font-weight: bold;
+    }
+
+    .board-card:nth-child(2)
+    .board-icon {
+      background:
+        var(--mint);
+    }
+
+    .board-card:nth-child(3)
+    .board-icon {
+      background:
+        var(--pastel-yellow);
+    }
+
+    .board-card:nth-child(4)
+    .board-icon {
+      background:
+        var(--mint-light);
+    }
+
+    .board-card h3 {
+      margin:
+        0 0 7px;
+
+      font-size: 20px;
+    }
+
+    .board-card p {
+      margin: 0;
+
+      color:
+        var(--brown-light);
+
+      font-size: 11px;
+    }
+
+    .board-link {
+      position: absolute;
+
+      right: 21px;
       bottom: 19px;
 
-      color: var(--royal);
+      color:
+        var(--brown);
 
       font-size: 11px;
 
-      font-weight: 800;
+      font-weight: bold;
     }
 
 
-    /* =========================================================
-       PARTICIPATE
-       ========================================================= */
+    /* =====================================================
+       PROJECT PARTICIPATION
+    ====================================================== */
 
     .participate {
-
       display: grid;
 
       grid-template-columns:
@@ -2035,238 +756,279 @@ footer {
       gap: 18px;
     }
 
-
     .panel {
+      padding: 30px;
 
-      padding: 28px;
+      background:
+        var(--white);
+
+      border:
+        1px solid var(--line);
 
       border-radius:
         var(--radius);
-
-      background: white;
-
-      border:
-        1px solid
-        var(--line);
 
       box-shadow:
         var(--shadow);
     }
 
-
-    .panel.dark {
-
-      color: white;
-
+    .panel-yellow {
       background:
         linear-gradient(
           135deg,
-          var(--dark),
-          #103B71
+          var(--pastel-yellow),
+          #FFF9DC
         );
-
-      border: 0;
     }
 
+    .panel-label {
+      color:
+        var(--canary-dark);
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      font-size: 11px;
+
+      font-weight: bold;
+
+      letter-spacing: 1.3px;
+    }
+
+    .panel h2 {
+      margin:
+        10px 0;
+
+      font-size: 30px;
+
+      letter-spacing: -2px;
+    }
+
+    .panel-description {
+      color:
+        var(--brown-light);
+
+      font-size: 12px;
+    }
 
     .steps {
-
       display: grid;
 
-      gap: 17px;
+      gap: 18px;
 
-      margin-top: 20px;
+      margin-top: 22px;
     }
 
-
     .step {
-
       display: grid;
 
       grid-template-columns:
         36px 1fr;
 
       gap: 12px;
-
-      align-items: start;
     }
 
-
     .step-no {
-
       width: 32px;
       height: 32px;
 
       display: grid;
-
       place-items: center;
 
-      color: var(--dark);
-
       background:
-        var(--point);
+        var(--mint);
+
+      color:
+        var(--brown);
 
       border-radius: 9px;
 
-      font-weight: 800;
+      font-family:
+        Arial,
+        sans-serif;
 
-      font-size: 11px;
+      font-size: 10px;
+
+      font-weight: bold;
     }
-
 
     .step strong {
-
       display: block;
 
-      font-size: 13px;
-
       margin-bottom: 2px;
+
+      font-size: 13px;
     }
 
-
     .step span {
-
-      color: var(--muted);
+      color:
+        var(--brown-light);
 
       font-size: 11px;
     }
 
 
-    .dark .step span {
-
-      color:
-        rgba(255,255,255,.58);
-    }
-
-
-    /* =========================================================
-       SUPABASE STATUS
-       ========================================================= */
+    /* =====================================================
+       STATUS BOX
+    ====================================================== */
 
     .status-box {
-
       display: flex;
 
       align-items: center;
 
       justify-content: space-between;
 
-      gap: 20px;
+      gap: 15px;
 
-      padding: 16px 18px;
-
-      border-radius: 13px;
-
-      background: #F4F7FC;
-
-      border:
-        1px solid
-        var(--line);
+      padding:
+        16px 18px;
 
       margin-top: 18px;
+
+      background:
+        var(--cream);
+
+      border:
+        1px solid var(--line);
+
+      border-radius: 13px;
     }
 
-
     .status-left {
-
       display: flex;
 
       align-items: center;
 
       gap: 9px;
 
-      font-size: 11px;
+      color:
+        var(--brown-light);
 
-      color: var(--muted);
+      font-size: 11px;
     }
 
-
     .status-indicator {
-
       width: 8px;
       height: 8px;
 
       border-radius: 50%;
 
-      background: #9AA8BA;
+      background:
+        #C5BDA7;
     }
-
 
     .status-indicator.ok {
-
-      background: var(--point);
+      background:
+        var(--mint);
 
       box-shadow:
-        0 0 9px
-        rgba(72,213,176,.7);
+        0 0 10px rgba(101, 214, 178, 0.75);
+    }
+
+    .status-value {
+      color:
+        var(--brown);
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      font-size: 10px;
+
+      font-weight: bold;
     }
 
 
-    /* =========================================================
+    /* =====================================================
        CTA
-       ========================================================= */
+    ====================================================== */
 
     .cta {
-
-      padding: 55px 45px;
-
-      color: white;
-
-      border-radius: 25px;
-
-      background:
-        radial-gradient(
-          circle at 80% 20%,
-          rgba(72,213,176,.18),
-          transparent 30%
-        ),
-
-        linear-gradient(
-          135deg,
-          var(--dark),
-          #174D8D
-        );
+      position: relative;
 
       overflow: hidden;
 
-      position: relative;
+      padding:
+        58px 45px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--pastel-yellow),
+          #FFF9D9
+        );
+
+      border:
+        1px solid var(--line);
+
+      border-radius: 25px;
+
+      box-shadow:
+        var(--shadow);
     }
 
+    .cta::after {
+      content: "";
+
+      position: absolute;
+
+      width: 280px;
+      height: 280px;
+
+      right: -100px;
+      bottom: -120px;
+
+      border-radius: 50%;
+
+      background:
+        var(--mint);
+
+      opacity:
+        0.20;
+    }
 
     .cta h2 {
+      position: relative;
+      z-index: 2;
 
-      max-width: 700px;
+      margin:
+        0 0 8px;
 
-      margin: 0 0 8px;
+      font-size: 35px;
 
-      font-size: 30px;
-
-      letter-spacing: -1.5px;
+      letter-spacing: -2px;
     }
 
-
     .cta p {
+      position: relative;
+      z-index: 2;
 
-      max-width: 650px;
+      max-width: 680px;
 
       margin: 0;
 
       color:
-        rgba(255,255,255,.64);
+        var(--brown-light);
 
       font-size: 12px;
     }
 
+    .cta .hero-buttons {
+      position: relative;
+      z-index: 3;
+    }
 
-    /* =========================================================
+
+    /* =====================================================
        AUTH MODAL
-       ========================================================= */
+    ====================================================== */
 
     .modal {
-
       position: fixed;
 
-      z-index: 300;
+      z-index: 3000;
 
       inset: 0;
 
@@ -2277,126 +1039,114 @@ footer {
       padding: 20px;
 
       background:
-        rgba(4,13,28,.72);
+        rgba(64, 53, 31, 0.45);
 
       backdrop-filter:
         blur(8px);
     }
 
-
     .modal.show {
-
       display: grid;
     }
 
-
     .modal-card {
-
       width:
         min(430px, 100%);
 
-      background: white;
+      padding: 30px;
 
-      border-radius: 20px;
+      background:
+        var(--cream);
 
-      padding: 28px;
+      border:
+        1px solid var(--line);
+
+      border-radius:
+        20px;
 
       box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.25);
+        0 30px 90px
+        rgba(64, 53, 31, 0.25);
 
       animation:
         modalIn .25s ease;
     }
 
-
     @keyframes modalIn {
-
       from {
-
         opacity: 0;
 
         transform:
-          translateY(12px)
-          scale(.98);
+          translateY(15px)
+          scale(0.97);
       }
 
       to {
-
         opacity: 1;
 
         transform:
           translateY(0)
           scale(1);
       }
-
     }
-
 
     .modal-head {
-
       display: flex;
 
-      justify-content:
-        space-between;
+      align-items: center;
 
-      align-items:
-        center;
+      justify-content: space-between;
     }
-
 
     .modal-head h3 {
-
       margin: 0;
 
-      font-size: 20px;
+      font-size: 23px;
     }
 
-
     .close {
-
       border: 0;
 
       background:
         transparent;
 
       color:
-        var(--muted);
+        var(--brown-light);
 
-      font-size: 22px;
+      font-size: 25px;
     }
-
 
     .form-group {
-
-      margin-top: 14px;
+      margin-top: 15px;
     }
 
-
     .form-group label {
-
       display: block;
 
       margin-bottom: 5px;
 
       color:
-        var(--muted);
+        var(--brown-2);
 
       font-size: 11px;
 
-      font-weight: 700;
+      font-weight: bold;
     }
 
-
     .form-group input {
-
       width: 100%;
 
-      padding: 12px 13px;
+      padding:
+        12px 13px;
+
+      color:
+        var(--brown);
+
+      background:
+        white;
 
       border:
-        1px solid
-        var(--line);
+        1px solid var(--line);
 
       border-radius: 10px;
 
@@ -2405,43 +1155,88 @@ footer {
       font-size: 12px;
     }
 
-
     .form-group input:focus {
-
       border-color:
-        var(--royal);
+        var(--mint);
 
       box-shadow:
         0 0 0 3px
-        rgba(36,87,214,.09);
+        rgba(101, 214, 178, 0.15);
     }
 
-
     .auth-message {
-
       min-height: 18px;
 
       margin-top: 10px;
 
       color:
-        var(--royal);
+        var(--brown-light);
 
       font-size: 11px;
     }
 
 
-    /* =========================================================
-       FOOTER
-       ========================================================= */
+    /* =====================================================
+       TOAST
+    ====================================================== */
 
-    footer {
+    .toast {
+      position: fixed;
+
+      z-index: 5000;
+
+      left: 50%;
+      bottom: 30px;
+
+      transform:
+        translateX(-50%)
+        translateY(20px);
 
       padding:
-        35px 0
-        55px;
+        13px 20px;
 
       color:
-        var(--muted);
+        var(--brown);
+
+      background:
+        var(--mint);
+
+      border-radius:
+        999px;
+
+      box-shadow:
+        0 10px 30px
+        rgba(64, 53, 31, 0.15);
+
+      font-size: 12px;
+
+      opacity: 0;
+
+      pointer-events: none;
+
+      transition:
+        all 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+
+      transform:
+        translateX(-50%)
+        translateY(0);
+    }
+
+
+    /* =====================================================
+       FOOTER
+    ====================================================== */
+
+    footer {
+      padding:
+        35px 0 55px;
+
+      color:
+        var(--brown-light);
 
       text-align:
         center;
@@ -2450,66 +1245,75 @@ footer {
     }
 
 
-    /* =========================================================
+    /* =====================================================
        RESPONSIVE
-       ========================================================= */
+    ====================================================== */
 
     @media (max-width: 900px) {
 
       .board-grid {
-
         grid-template-columns:
           repeat(2, 1fr);
       }
 
       .participate {
-
         grid-template-columns:
           1fr;
       }
 
       .nav {
-
         display: none;
       }
 
     }
 
-
     @media (max-width: 560px) {
 
-      .hero {
+      .header {
+        padding:
+          0 18px;
+      }
 
-        min-height: 680px;
+      .header-user {
+        display: none;
+      }
+
+      .hero {
+        min-height: 720px;
+      }
+
+      .hero-content {
+        width: 88%;
       }
 
       .hero h1 {
+        font-size: 43px;
 
         letter-spacing:
-          -2.5px;
+          -2px;
       }
 
       .hero-stats {
-
         gap: 20px;
       }
 
       .board-grid {
-
         grid-template-columns:
           1fr;
       }
 
       .section {
-
         padding:
           65px 0;
       }
 
       .cta {
-
         padding:
           35px 25px;
+      }
+
+      .cta h2 {
+        font-size: 28px;
       }
 
     }
@@ -2521,13 +1325,13 @@ footer {
 <body>
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        HEADER
-       ========================================================= -->
+  ====================================================== -->
 
   <header class="header">
 
-    <a class="logo" href="#home">
+    <a href="#home" class="logo">
 
       <span class="logo-mark">
         HD
@@ -2574,35 +1378,37 @@ footer {
 
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        HERO
-       ========================================================= -->
+  ====================================================== -->
 
-  <section
-    class="hero"
-    id="home">
+  <section class="hero" id="home">
 
-    <!-- 움직이는 그리드 -->
+
+    <!-- 움직이는 배경 -->
 
     <div class="hero-grid"></div>
 
 
-    <!-- 움직이는 빛 -->
+    <!-- 움직이는 오브젝트 -->
 
-    <div class="orb one"></div>
+    <div class="hero-orb orb-yellow"></div>
 
-    <div class="orb two"></div>
+    <div class="hero-orb orb-mint"></div>
 
+
+    <!-- HERO CONTENT -->
 
     <div class="hero-content">
 
-      <span class="eyebrow">
 
-        <i></i>
+      <div class="eyebrow">
+
+        <span class="eyebrow-dot"></span>
 
         INTERNAL PROJECT · 2026
 
-      </span>
+      </div>
 
 
       <h1>
@@ -2619,13 +1425,14 @@ footer {
       <p class="hero-description">
 
         홍보실에서 운영하는 사내 프로젝트 전용 공간입니다.
-        프로젝트 참여자들이 공지사항, 아이디어, 자료, 이미지와 결과물을
-        한 곳에서 공유하고 협업할 수 있습니다.
+        프로젝트 참여자들이 공지사항, 아이디어, 자료,
+        이미지와 결과물을 한 곳에서 공유하고 협업할 수 있습니다.
 
       </p>
 
 
       <div class="hero-buttons">
+
 
         <button
           class="btn btn-primary"
@@ -2653,10 +1460,12 @@ footer {
 
         </a>
 
+
       </div>
 
 
       <div class="hero-stats">
+
 
         <div class="stat">
 
@@ -2696,6 +1505,7 @@ footer {
 
         </div>
 
+
       </div>
 
     </div>
@@ -2704,16 +1514,18 @@ footer {
 
 
 
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
   <main>
 
 
-    <!-- =======================================================
-         BOARD TYPES
-         ======================================================= -->
+    <!-- ===================================================
+         BOARD SECTION
+    ==================================================== -->
 
-    <section
-      class="section"
-      id="boards">
+    <section class="section" id="boards">
 
       <div class="container">
 
@@ -2741,9 +1553,9 @@ footer {
           <!-- 공지사항 -->
 
           <a
-            class="board-card"
             href="#"
-            onclick="boardNotice(event)">
+            class="board-card"
+            onclick="openBoard(event, '공지사항')">
 
             <span class="board-number">
               01 · NOTICE
@@ -2772,13 +1584,12 @@ footer {
           </a>
 
 
-
           <!-- 자유게시판 -->
 
           <a
-            class="board-card"
             href="#"
-            onclick="boardWebzine(event)">
+            class="board-card"
+            onclick="openBoard(event, '자유게시판')">
 
             <span class="board-number">
               02 · WEBZINE
@@ -2795,8 +1606,8 @@ footer {
             <p>
 
               웹진 형태로 아이디어,
-              프로젝트 이야기,
-              구성원의 의견과 콘텐츠를 자유롭게 공유합니다.
+              프로젝트 이야기와
+              구성원의 의견을 자유롭게 공유합니다.
 
             </p>
 
@@ -2807,13 +1618,12 @@ footer {
           </a>
 
 
-
           <!-- 자료실 -->
 
           <a
-            class="board-card"
             href="#"
-            onclick="boardFiles(event)">
+            class="board-card"
+            onclick="openBoard(event, '자료실')">
 
             <span class="board-number">
               03 · FILES
@@ -2831,7 +1641,7 @@ footer {
 
               프로젝트 문서,
               참고자료,
-              발표자료 및 업무 관련 파일을 업로드합니다.
+              발표자료 및 업무 관련 파일을 관리합니다.
 
             </p>
 
@@ -2842,13 +1652,12 @@ footer {
           </a>
 
 
-
           <!-- 갤러리 -->
 
           <a
-            class="board-card"
             href="#"
-            onclick="boardGallery(event)">
+            class="board-card"
+            onclick="openBoard(event, '갤러리')">
 
             <span class="board-number">
               04 · GALLERY
@@ -2871,7 +1680,7 @@ footer {
             </p>
 
             <span class="board-link">
-              갤러리 보기 →
+              게시판 보기 →
             </span>
 
           </a>
@@ -2885,9 +1694,9 @@ footer {
 
 
 
-    <!-- =======================================================
-         PROJECT PARTICIPATION
-         ======================================================= -->
+    <!-- ===================================================
+         PARTICIPATION
+    ==================================================== -->
 
     <section
       class="section"
@@ -2901,18 +1710,12 @@ footer {
 
           <!-- 왼쪽 -->
 
-          <div class="panel dark">
+          <div class="panel panel-yellow">
 
-            <small
-              style="
-                color:var(--point);
-                font-weight:800;
-                letter-spacing:1px;
-              ">
 
+            <div class="panel-label">
               HOW TO PARTICIPATE
-
-            </small>
+            </div>
 
 
             <h2>
@@ -2920,14 +1723,9 @@ footer {
             </h2>
 
 
-            <p
-              style="
-                color:rgba(255,255,255,.6);
-                font-size:12px;
-              ">
+            <p class="panel-description">
 
-              사내 프로젝트 참여자는
-              간단한 회원가입 후
+              프로젝트 참여자는 간단한 회원가입 후
               프로젝트 공간에서 자료와 의견을 공유할 수 있습니다.
 
             </p>
@@ -2970,7 +1768,7 @@ footer {
                   </strong>
 
                   <span>
-                    프로젝트 안내 및 참여 정보를 확인합니다.
+                    프로젝트 안내와 참여 정보를 확인합니다.
                   </span>
 
                 </div>
@@ -3004,12 +1802,13 @@ footer {
 
             <button
               class="btn btn-primary"
-              style="margin-top:25px;"
+              style="margin-top:25px"
               onclick="openAuth('signup')">
 
               지금 회원가입
 
             </button>
+
 
           </div>
 
@@ -3021,16 +1820,10 @@ footer {
             class="panel"
             id="about">
 
-            <small
-              style="
-                color:var(--royal);
-                font-weight:800;
-                letter-spacing:1px;
-              ">
 
+            <div class="panel-label">
               PROJECT GUIDE
-
-            </small>
+            </div>
 
 
             <h2>
@@ -3038,11 +1831,7 @@ footer {
             </h2>
 
 
-            <p
-              style="
-                color:var(--muted);
-                font-size:12px;
-              ">
+            <p class="panel-description">
 
               이 사이트는 홍보실에서 운영하는
               사내 프로젝트의 커뮤니케이션과
@@ -3068,28 +1857,20 @@ footer {
 
               </div>
 
-              <span
-                style="
-                  font-size:10px;
-                  color:var(--muted);
-                ">
-
+              <span class="status-value">
                 DATABASE
-
               </span>
 
             </div>
 
 
-            <!-- 게시판 -->
+            <!-- 게시판 상태 -->
 
             <div class="status-box">
 
               <div class="status-left">
 
-                <span
-                  class="status-indicator ok">
-                </span>
+                <span class="status-indicator ok"></span>
 
                 <span>
                   프로젝트 커뮤니티
@@ -3097,15 +1878,9 @@ footer {
 
               </div>
 
-              <strong
-                style="
-                  font-size:11px;
-                  color:var(--royal);
-                ">
-
+              <span class="status-value">
                 4 BOARDS
-
-              </strong>
+              </span>
 
             </div>
 
@@ -3116,25 +1891,17 @@ footer {
 
               <div class="status-left">
 
-                <span
-                  class="status-indicator ok">
-                </span>
+                <span class="status-indicator ok"></span>
 
                 <span>
-                  참여 대상
+                  프로젝트 참여자
                 </span>
 
               </div>
 
-              <strong
-                style="
-                  font-size:11px;
-                  color:var(--royal);
-                ">
-
+              <span class="status-value">
                 30+ MEMBERS
-
-              </strong>
+              </span>
 
             </div>
 
@@ -3150,9 +1917,9 @@ footer {
 
 
 
-    <!-- =======================================================
+    <!-- ===================================================
          CTA
-         ======================================================= -->
+    ==================================================== -->
 
     <section class="section">
 
@@ -3160,9 +1927,11 @@ footer {
 
         <div class="cta">
 
+
           <h2>
             프로젝트의 모든 과정에 함께해주세요.
           </h2>
+
 
           <p>
 
@@ -3195,6 +1964,7 @@ footer {
 
           </div>
 
+
         </div>
 
       </div>
@@ -3206,25 +1976,28 @@ footer {
 
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        FOOTER
-       ========================================================= -->
+  ====================================================== -->
 
   <footer>
 
-    HD Project Hub · Internal Project Workspace · 2026
+    HD Project Hub
+    · Internal Project Workspace
+    · 2026
 
   </footer>
 
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        AUTH MODAL
-       ========================================================= -->
+  ====================================================== -->
 
   <div
     class="modal"
     id="authModal">
+
 
     <div class="modal-card">
 
@@ -3234,6 +2007,7 @@ footer {
         <h3 id="authTitle">
           프로젝트 회원가입
         </h3>
+
 
         <button
           class="close"
@@ -3260,8 +2034,8 @@ footer {
           </label>
 
           <input
-            id="authName"
             type="text"
+            id="authName"
             placeholder="홍길동"
           >
 
@@ -3277,8 +2051,8 @@ footer {
           </label>
 
           <input
-            id="authEmail"
             type="email"
+            id="authEmail"
             placeholder="name@company.com"
             required
           >
@@ -3295,8 +2069,8 @@ footer {
           </label>
 
           <input
-            id="authPassword"
             type="password"
+            id="authPassword"
             placeholder="6자 이상"
             minlength="6"
             required
@@ -3312,13 +2086,13 @@ footer {
 
 
         <button
+          type="submit"
           class="btn btn-primary"
+          id="authSubmit"
           style="
             width:100%;
-            margin-top:7px;
-          "
-          type="submit"
-          id="authSubmit">
+            margin-top:8px;
+          ">
 
           회원가입
 
@@ -3327,26 +2101,47 @@ footer {
 
       </form>
 
+
     </div>
 
   </div>
 
 
 
-  <!-- =========================================================
-       SUPABASE
-       ========================================================= -->
+  <!-- =====================================================
+       TOAST
+  ====================================================== -->
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-  </script>
+  <div
+    class="toast"
+    id="toast">
 
+    준비 중입니다.
+
+  </div>
+
+
+
+  <!-- =====================================================
+       SUPABASE LIBRARY
+  ====================================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
 
   <script>
 
-    /* =========================================================
+
+    /* =====================================================
        SUPABASE CONFIG
-       ========================================================= */
+
+       제공해준 Supabase 프로젝트 정보
+    ====================================================== */
 
     const SUPABASE_URL =
       "https://drfkimpfuqgmldchvuvu.supabase.co";
@@ -3363,122 +2158,59 @@ footer {
       );
 
 
+    /* 현재 로그인/회원가입 모드 */
+
     let authMode = "signup";
 
 
-    /* =========================================================
-       SESSION CHECK
-       ========================================================= */
 
-    async function checkSession() {
+    /* =====================================================
+       TOAST
+    ====================================================== */
 
-      try {
+    function showToast(message) {
 
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.getSession();
+      const toast =
+        document.getElementById("toast");
 
+      toast.textContent =
+        message;
 
-        if (error) {
-          throw error;
-        }
+      toast.classList.add("show");
 
 
-        updateUserUI(
-          data.session?.user || null
-        );
+      setTimeout(() => {
 
+        toast.classList.remove("show");
 
-        const indicator =
-          document.getElementById(
-            "supabaseIndicator"
-          );
-
-
-        const status =
-          document.getElementById(
-            "supabaseStatus"
-          );
-
-
-        indicator.classList.add("ok");
-
-        status.textContent =
-          "Supabase 연결 완료";
-
-
-      } catch (error) {
-
-        console.error(error);
-
-        document.getElementById(
-          "supabaseStatus"
-        ).textContent =
-          "Supabase 연결 확인 필요";
-
-      }
+      }, 2500);
 
     }
 
 
-    /* =========================================================
-       USER UI
-       ========================================================= */
 
-    function updateUserUI(user) {
+    /* =====================================================
+       BOARD
 
-      const dot =
-        document.getElementById(
-          "userDot"
-        );
+       현재는 UI 연결 상태.
+       이후 Supabase posts 테이블과 연결하면 됩니다.
+    ====================================================== */
 
+    function openBoard(event, boardName) {
 
-      const status =
-        document.getElementById(
-          "userStatus"
-        );
+      event.preventDefault();
 
-
-      if (user) {
-
-        dot.classList.add("on");
-
-        status.textContent =
-          user.email ||
-          "로그인됨";
-
-      } else {
-
-        dot.classList.remove("on");
-
-        status.textContent =
-          "로그인 전";
-
-      }
+      showToast(
+        boardName + " 게시판을 준비 중입니다."
+      );
 
     }
 
 
-    /* =========================================================
-       AUTH STATE
-       ========================================================= */
 
-    supabaseClient.auth.onAuthStateChange(
-      (_event, session) => {
-
-        updateUserUI(
-          session?.user || null
-        );
-
-      }
-    );
-
-
-    /* =========================================================
-       OPEN AUTH
-       ========================================================= */
+    /* =====================================================
+       AUTH MODAL OPEN
+    ====================================================== */
 
     function openAuth(mode) {
 
@@ -3486,33 +2218,19 @@ footer {
 
 
       const modal =
-        document.getElementById(
-          "authModal"
-        );
-
+        document.getElementById("authModal");
 
       const title =
-        document.getElementById(
-          "authTitle"
-        );
-
+        document.getElementById("authTitle");
 
       const submit =
-        document.getElementById(
-          "authSubmit"
-        );
-
+        document.getElementById("authSubmit");
 
       const nameGroup =
-        document.getElementById(
-          "nameGroup"
-        );
-
+        document.getElementById("nameGroup");
 
       const message =
-        document.getElementById(
-          "authMessage"
-        );
+        document.getElementById("authMessage");
 
 
       message.textContent = "";
@@ -3529,7 +2247,9 @@ footer {
         nameGroup.style.display =
           "block";
 
-      } else {
+      }
+
+      else {
 
         title.textContent =
           "프로젝트 로그인";
@@ -3548,9 +2268,10 @@ footer {
     }
 
 
-    /* =========================================================
-       CLOSE AUTH
-       ========================================================= */
+
+    /* =====================================================
+       AUTH MODAL CLOSE
+    ====================================================== */
 
     function closeAuth() {
 
@@ -3566,16 +2287,17 @@ footer {
     }
 
 
-    /* 모달 외부 클릭 */
+
+    /* 모달 바깥 클릭 */
 
     document
       .getElementById("authModal")
       .addEventListener(
         "click",
-        (e) => {
+        function(event) {
 
           if (
-            e.target.id ===
+            event.target.id ===
             "authModal"
           ) {
 
@@ -3587,17 +2309,145 @@ footer {
       );
 
 
-    /* =========================================================
+
+    /* =====================================================
+       SESSION
+    ====================================================== */
+
+    async function checkSession() {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .auth
+            .getSession();
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        updateUserUI(
+          data.session
+            ? data.session.user
+            : null
+        );
+
+
+        document
+          .getElementById(
+            "supabaseIndicator"
+          )
+          .classList.add("ok");
+
+
+        document
+          .getElementById(
+            "supabaseStatus"
+          )
+          .textContent =
+          "Supabase 연결 완료";
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Supabase Error:",
+          error
+        );
+
+
+        document
+          .getElementById(
+            "supabaseStatus"
+          )
+          .textContent =
+          "Supabase 연결 확인 필요";
+
+      }
+
+    }
+
+
+
+    /* =====================================================
+       USER UI
+    ====================================================== */
+
+    function updateUserUI(user) {
+
+      const dot =
+        document.getElementById(
+          "userDot"
+        );
+
+      const status =
+        document.getElementById(
+          "userStatus"
+        );
+
+
+      if (user) {
+
+        dot.classList.add("on");
+
+        status.textContent =
+          user.email ||
+          "로그인됨";
+
+      }
+
+      else {
+
+        dot.classList.remove("on");
+
+        status.textContent =
+          "로그인 전";
+
+      }
+
+    }
+
+
+
+    /* =====================================================
+       AUTH STATE LISTENER
+    ====================================================== */
+
+    supabaseClient
+      .auth
+      .onAuthStateChange(
+        function(event, session) {
+
+          updateUserUI(
+            session
+              ? session.user
+              : null
+          );
+
+        }
+      );
+
+
+
+    /* =====================================================
        SIGNUP / LOGIN
-       ========================================================= */
+    ====================================================== */
 
     document
       .getElementById("authForm")
       .addEventListener(
         "submit",
-        async (e) => {
+        async function(event) {
 
-          e.preventDefault();
+          event.preventDefault();
 
 
           const email =
@@ -3649,14 +2499,11 @@ footer {
           try {
 
 
-            /* =========================
+            /* =============================================
                SIGN UP
-               ========================= */
+            ============================================== */
 
-            if (
-              authMode ===
-              "signup"
-            ) {
+            if (authMode === "signup") {
 
 
               const {
@@ -3667,9 +2514,11 @@ footer {
                   .auth
                   .signUp({
 
-                    email,
+                    email:
+                      email,
 
-                    password,
+                    password:
+                      password,
 
                     options: {
 
@@ -3695,26 +2544,31 @@ footer {
                 message.textContent =
                   "회원가입이 완료되었습니다.";
 
+                showToast(
+                  "회원가입이 완료되었습니다."
+                );
+
 
                 setTimeout(
                   closeAuth,
                   800
                 );
 
-              } else {
-
-                message.textContent =
-                  "가입이 완료되었습니다. 이메일 인증 후 로그인해주세요.";
-
               }
 
+              else {
+
+                message.textContent =
+                  "회원가입 완료! 이메일 인증 후 로그인해주세요.";
+
+              }
 
             }
 
 
-            /* =========================
+            /* =============================================
                LOGIN
-               ========================= */
+            ============================================== */
 
             else {
 
@@ -3727,9 +2581,11 @@ footer {
                   .auth
                   .signInWithPassword({
 
-                    email,
+                    email:
+                      email,
 
-                    password
+                    password:
+                      password
 
                   });
 
@@ -3743,23 +2599,37 @@ footer {
                 "로그인되었습니다.";
 
 
+              showToast(
+                "로그인되었습니다."
+              );
+
+
               setTimeout(
                 closeAuth,
-                600
+                700
               );
 
             }
 
 
-          } catch (error) {
+          }
 
-            console.error(error);
+          catch (error) {
+
+            console.error(
+              "Auth Error:",
+              error
+            );
+
 
             message.textContent =
               error.message ||
               "처리 중 오류가 발생했습니다.";
 
-          } finally {
+          }
+
+
+          finally {
 
             submit.disabled =
               false;
@@ -3770,64 +2640,15 @@ footer {
       );
 
 
-    /* =========================================================
-       BOARD PLACEHOLDER
-       ---------------------------------------------------------
-       실제 게시판을 연결할 때 아래 함수들을 수정합니다.
-       ========================================================= */
 
-    function boardNotice(e) {
-
-      e.preventDefault();
-
-      alert(
-        "공지사항 게시판을 준비 중입니다."
-      );
-
-    }
-
-
-    function boardWebzine(e) {
-
-      e.preventDefault();
-
-      alert(
-        "자유게시판(웹진)을 준비 중입니다."
-      );
-
-    }
-
-
-    function boardFiles(e) {
-
-      e.preventDefault();
-
-      alert(
-        "자료실을 준비 중입니다."
-      );
-
-    }
-
-
-    function boardGallery(e) {
-
-      e.preventDefault();
-
-      alert(
-        "갤러리를 준비 중입니다."
-      );
-
-    }
-
-
-    /* =========================================================
+    /* =====================================================
        INITIALIZE
-       ========================================================= */
+    ====================================================== */
 
     checkSession();
 
-  </script>
 
+  </script>
 
 </body>
 </html>
