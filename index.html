@@ -1,325 +1,2551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
--- ================================================================
--- PROJECT BLUE / Supabase Setup SQL
--- ������������ + ��������� ��������������� + ��������� + ��������� + ������ ������ ���������
--- Supabase Dashboard > SQL Editor > New query ������ ������ ������
--- ================================================================
+  <title>HD Project Hub | 사내 프로젝트</title>
 
--- 0) Extensions
-create extension if not exists "pgcrypto";
+  <!-- Nanum Gothic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap"
+    rel="stylesheet"
+  >
 
--- 1) Profiles
-create table if not exists public.profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  full_name text not null default '',
-  department text not null default '',
-  role text not null default 'member' check (role in ('member','admin')),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+  <style>
+    /* =========================================================
+       HD PROJECT HUB
+       ---------------------------------------------------------
+       Color System
+       Dark Blue  : #071A35
+       Royal Blue : #2457D6
+       Point      : #48D5B0
+       ========================================================= */
 
-comment on table public.profiles is '������������ ��������� ������ ���������';
-comment on column public.profiles.role is 'member ������ admin';
+    :root {
+      --dark: #071A35;
+      --dark-2: #0D2B54;
 
--- 2) Posts
-create table if not exists public.posts (
-  id uuid primary key default gen_random_uuid(),
-  category text not null check (category in ('notice','magazine','files','gallery')),
-  title text not null check (char_length(title) between 1 and 150),
-  content text not null default '' check (char_length(content) <= 10000),
-  author_id uuid not null references public.profiles(id) on delete cascade,
-  status text not null default 'published' check (status in ('draft','published')),
-  is_pinned boolean not null default false,
+      --royal: #2457D6;
+      --royal-2: #3972F0;
 
-  -- ������������ 1��� ������������ ���������������
-  attachment_path text,
-  attachment_name text,
+      --point: #48D5B0;
+      --point-2: #B8FFF0;
 
-  -- ������������ ������ ��������� ������
-  cover_path text,
+      --bg: #F4F7FC;
+      --white: #FFFFFF;
 
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+      --text: #142033;
+      --muted: #708099;
 
-create index if not exists posts_category_created_idx
-  on public.posts(category, created_at desc);
+      --line: #DDE5F1;
 
-create index if not exists posts_author_idx
-  on public.posts(author_id);
+      --shadow: 0 18px 50px rgba(7, 26, 53, .10);
 
-create index if not exists posts_pinned_idx
-  on public.posts(category, is_pinned desc, created_at desc);
+      --radius: 20px;
+    }
 
--- 3) ������ updated_at trigger
-create or replace function public.set_updated_at()
-returns trigger
-language plpgsql
-as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
+    * {
+      box-sizing: border-box;
+    }
 
-drop trigger if exists profiles_set_updated_at on public.profiles;
-create trigger profiles_set_updated_at
-before update on public.profiles
-for each row execute procedure public.set_updated_at();
+    html {
+      scroll-behavior: smooth;
+    }
 
-drop trigger if exists posts_set_updated_at on public.posts;
-create trigger posts_set_updated_at
-before update on public.posts
-for each row execute procedure public.set_updated_at();
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        "Nanum Gothic",
+        "Malgun Gothic",
+        "Apple SD Gothic Neo",
+        sans-serif;
 
--- 4) auth.users ������ ��� profiles ������ ������
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = ''
-as $$
-begin
-  insert into public.profiles (id, full_name, department)
-  values (
-    new.id,
-    coalesce(new.raw_user_meta_data ->> 'full_name', ''),
-    coalesce(new.raw_user_meta_data ->> 'department', '')
-  )
-  on conflict (id) do nothing;
+      line-height: 1.6;
+    }
 
-  return new;
-end;
-$$;
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-after insert on auth.users
-for each row execute procedure public.handle_new_user();
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
 
--- ������ Auth ��������� ��� profiles��� ������ ������������ ��������� ������
-insert into public.profiles (id, full_name, department)
-select
-  u.id,
-  coalesce(u.raw_user_meta_data ->> 'full_name', ''),
-  coalesce(u.raw_user_meta_data ->> 'department', '')
-from auth.users u
-left join public.profiles p on p.id = u.id
-where p.id is null
-on conflict (id) do nothing;
+    button {
+      cursor: pointer;
+    }
 
--- 5) ��������� ������ helper
-create or replace function public.is_admin()
-returns boolean
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  select exists (
-    select 1
-    from public.profiles
-    where id = auth.uid()
-      and role = 'admin'
-  );
-$$;
+    /* =========================================================
+       HEADER
+       ========================================================= */
 
-revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to authenticated;
+    .header {
+      position: fixed;
+      z-index: 100;
 
--- 6) RLS ���������
-alter table public.profiles enable row level security;
-alter table public.posts enable row level security;
+      top: 0;
+      left: 0;
 
--- Profiles policies
-drop policy if exists "profiles_read_authenticated" on public.profiles;
-create policy "profiles_read_authenticated"
-on public.profiles
-for select
-to authenticated
-using (true);
+      width: 100%;
+      height: 74px;
 
-drop policy if exists "profiles_update_own" on public.profiles;
-create policy "profiles_update_own"
-on public.profiles
-for update
-to authenticated
-using (id = auth.uid())
-with check (id = auth.uid());
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
--- role ��������� authenticated������ UPDATE ��������� ������������ ������������.
--- ��������� ������������ RLS��� ������������������ ��������� role��� admin������ ��������� ��� ������������.
+      padding: 0 5vw;
 
--- Posts SELECT: ������������ ��������� published ��������� ������
-drop policy if exists "posts_read_authenticated" on public.posts;
-create policy "posts_read_authenticated"
-on public.posts
-for select
-to authenticated
-using (
-  status = 'published'
-  or author_id = auth.uid()
-  or public.is_admin()
-);
+      color: white;
 
--- Posts INSERT:
--- 1) ������ ������������ ��������� ������ ������
--- 2) ��������������� admin��� ������ ������
-drop policy if exists "posts_insert_member" on public.posts;
-create policy "posts_insert_member"
-on public.posts
-for insert
-to authenticated
-with check (
-  author_id = auth.uid()
-  and (
-    category <> 'notice'
-    or public.is_admin()
-  )
-  and (
-    is_pinned = false
-    or public.is_admin()
-  )
-);
+      background: rgba(7, 26, 53, .78);
 
--- Posts UPDATE: ��������� ������ ������ admin
--- ������������������ category��� ��������������� pinned=true��� ��������� ������ admin��� ������
-drop policy if exists "posts_update_own_or_admin" on public.posts;
-create policy "posts_update_own_or_admin"
-on public.posts
-for update
-to authenticated
-using (
-  author_id = auth.uid()
-  or public.is_admin()
-)
-with check (
-  (
-    author_id = auth.uid()
-    or public.is_admin()
-  )
-  and (
-    category <> 'notice'
-    or public.is_admin()
-  )
-  and (
-    is_pinned = false
-    or public.is_admin()
-  )
-);
+      border-bottom:
+        1px solid rgba(255,255,255,.08);
 
--- Posts DELETE: ��������� ������ ������ admin
-drop policy if exists "posts_delete_own_or_admin" on public.posts;
-create policy "posts_delete_own_or_admin"
-on public.posts
-for delete
-to authenticated
-using (
-  author_id = auth.uid()
-  or public.is_admin()
-);
+      backdrop-filter: blur(16px);
+    }
 
--- 7) ������ ������ grant
-grant usage on schema public to authenticated;
-grant select on public.profiles to authenticated;
-grant update (full_name, department, updated_at) on public.profiles to authenticated;
+    .logo {
+      display: flex;
+      align-items: center;
 
-grant select, insert, update, delete on public.posts to authenticated;
+      gap: 11px;
 
--- ������ ���������(������������)��� ������������ ��������� ������ ������
-revoke all on public.profiles from anon;
-revoke all on public.posts from anon;
+      font-weight: 800;
 
--- 8) Storage buckets
--- private bucket: ������������ ��������� SELECT ������
-insert into storage.buckets (id, name, public, file_size_limit)
-values
-  ('project-files', 'project-files', false, 52428800),
-  ('project-images', 'project-images', false, 10485760)
-on conflict (id) do update set
-  public = excluded.public,
-  file_size_limit = excluded.file_size_limit;
+      letter-spacing: -.5px;
+    }
 
--- Storage policies
--- SELECT: ��������� ��������������� ������������ ������ ������ ������ ������
-drop policy if exists "project_storage_read_authenticated" on storage.objects;
-create policy "project_storage_read_authenticated"
-on storage.objects
-for select
-to authenticated
-using (
-  bucket_id in ('project-files','project-images')
-);
+    .logo-mark {
+      width: 38px;
+      height: 38px;
 
--- INSERT: ������ UUID ������������ ���������
-drop policy if exists "project_storage_insert_own_folder" on storage.objects;
-create policy "project_storage_insert_own_folder"
-on storage.objects
-for insert
-to authenticated
-with check (
-  bucket_id in ('project-files','project-images')
-  and (storage.foldername(name))[1] = auth.uid()::text
-);
+      display: grid;
+      place-items: center;
 
--- UPDATE: ������ ������ ������ admin
-drop policy if exists "project_storage_update_own_or_admin" on storage.objects;
-create policy "project_storage_update_own_or_admin"
-on storage.objects
-for update
-to authenticated
-using (
-  bucket_id in ('project-files','project-images')
-  and (
-    (storage.foldername(name))[1] = auth.uid()::text
-    or public.is_admin()
-  )
-)
-with check (
-  bucket_id in ('project-files','project-images')
-  and (
-    (storage.foldername(name))[1] = auth.uid()::text
-    or public.is_admin()
-  )
-);
+      border-radius: 11px;
 
--- DELETE: ������ ������ ������ admin
-drop policy if exists "project_storage_delete_own_or_admin" on storage.objects;
-create policy "project_storage_delete_own_or_admin"
-on storage.objects
-for delete
-to authenticated
-using (
-  bucket_id in ('project-files','project-images')
-  and (
-    (storage.foldername(name))[1] = auth.uid()::text
-    or public.is_admin()
-  )
-);
+      color: var(--dark);
 
--- 9) ������ ��������� ������ ������
--- ��������������� ������ ��������� ��� ������ ������������ ������ ��������� ������������ ��������� ���������������.
---
--- update public.profiles p
--- set role = 'admin'
--- from auth.users u
--- where p.id = u.id
---   and u.email = 'admin@company.com';
---
--- ������:
--- select u.email, p.full_name, p.department, p.role
--- from public.profiles p
--- join auth.users u on u.id = p.id
--- order by p.created_at;
+      background: var(--point);
 
--- 10) ������ ������: ��������� ������
--- Dashboard > Authentication > Sign In / Providers > Email
--- ������ ��������� ������ Confirm email ��������� ������ ������������ ��� ��������� ������ ��������� ���������������.
+      font-size: 12px;
+      font-weight: 800;
+    }
 
--- ================================================================
--- ������ ���������
--- ================================================================
-select 'profiles' as object_name, count(*) as row_count from public.profiles
-union all
-select 'posts', count(*) from public.posts;
+    .nav {
+      display: flex;
+      gap: 5px;
+    }
 
-    
+    .nav a {
+      color: rgba(255,255,255,.78);
+
+      font-size: 13px;
+
+      padding: 9px 12px;
+
+      border-radius: 9px;
+
+      transition: .2s;
+    }
+
+    .nav a:hover {
+      color: white;
+
+      background:
+        rgba(255,255,255,.10);
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+
+      gap: 9px;
+
+      font-size: 11px;
+    }
+
+    .user-dot {
+      width: 8px;
+      height: 8px;
+
+      background: #8796A8;
+
+      border-radius: 50%;
+    }
+
+    .user-dot.on {
+      background: var(--point);
+
+      box-shadow:
+        0 0 10px rgba(72,213,176,.7);
+    }
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .hero {
+      min-height: 720px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      display: flex;
+      align-items: center;
+
+      color: white;
+
+      background:
+        radial-gradient(
+          circle at 80% 20%,
+          rgba(36,87,214,.65),
+          transparent 35%
+        ),
+
+        radial-gradient(
+          circle at 20% 80%,
+          rgba(72,213,176,.18),
+          transparent 32%
+        ),
+
+        linear-gradient(
+          135deg,
+          #071A35 0%,
+          #0A2850 55%,
+          #123E78 100%
+        );
+    }
+
+    /*
+      HERO 배경 그리드 애니메이션
+    */
+
+    .hero-grid {
+      position: absolute;
+
+      inset: -100px;
+
+      opacity: .16;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,.16) 1px,
+          transparent 1px
+        ),
+
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.16) 1px,
+          transparent 1px
+        );
+
+      background-size: 60px 60px;
+
+      transform:
+        perspective(500px)
+        rotateX(58deg)
+        translateY(80px)
+        scale(1.5);
+
+      transform-origin: center;
+
+      animation:
+        gridMove 18s linear infinite;
+    }
+
+    @keyframes gridMove {
+
+      from {
+        background-position: 0 0;
+      }
+
+      to {
+        background-position: 60px 60px;
+      }
+
+    }
+
+
+    /*
+      HERO 빛 효과
+    */
+
+    .orb {
+      position: absolute;
+
+      border-radius: 50%;
+
+      filter: blur(2px);
+
+      pointer-events: none;
+    }
+
+    .orb.one {
+
+      width: 340px;
+      height: 340px;
+
+      right: 5%;
+      top: 16%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(72,213,176,.20),
+          transparent 70%
+        );
+
+      animation:
+        floatOne 7s ease-in-out infinite;
+    }
+
+    .orb.two {
+
+      width: 280px;
+      height: 280px;
+
+      left: 4%;
+      bottom: 8%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(57,114,240,.24),
+          transparent 70%
+        );
+
+      animation:
+        floatTwo 9s ease-in-out infinite;
+    }
+
+    @keyframes floatOne {
+
+      0%,
+      100% {
+        transform:
+          translate(0,0)
+          scale(1);
+      }
+
+      50% {
+        transform:
+          translate(-40px,35px)
+          scale(1.12);
+      }
+
+    }
+
+    @keyframes floatTwo {
+
+      0%,
+      100% {
+        transform:
+          translate(0,0);
+      }
+
+      50% {
+        transform:
+          translate(45px,-30px);
+      }
+
+    }
+
+
+    .hero-content {
+
+      position: relative;
+      z-index: 2;
+
+      width: min(1180px, 90%);
+
+      margin: 0 auto;
+
+      padding-top: 60px;
+    }
+
+
+    .eyebrow {
+
+      display: inline-flex;
+
+      gap: 8px;
+
+      align-items: center;
+
+      padding: 7px 11px;
+
+      border:
+        1px solid
+        rgba(72,213,176,.35);
+
+      border-radius: 999px;
+
+      color: var(--point-2);
+
+      background:
+        rgba(72,213,176,.07);
+
+      font-size: 11px;
+
+      letter-spacing: 1.3px;
+    }
+
+    .eyebrow i {
+
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: var(--point);
+
+      box-shadow:
+        0 0 12px var(--point);
+    }
+
+
+    .hero h1 {
+
+      max-width: 800px;
+
+      margin: 22px 0 16px;
+
+      font-size:
+        clamp(40px, 6vw, 76px);
+
+      line-height: 1.08;
+
+      letter-spacing: -4px;
+    }
+
+    .hero h1 em {
+
+      color: var(--point);
+
+      font-style: normal;
+    }
+
+
+    .hero-description {
+
+      max-width: 680px;
+
+      color:
+        rgba(255,255,255,.72);
+
+      font-size: 15px;
+    }
+
+
+    .hero-buttons {
+
+      display: flex;
+
+      gap: 10px;
+
+      flex-wrap: wrap;
+
+      margin-top: 28px;
+    }
+
+
+    .btn {
+
+      border: 0;
+
+      border-radius: 11px;
+
+      padding: 12px 17px;
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      transition: .2s;
+    }
+
+
+    .btn-primary {
+
+      color: var(--dark);
+
+      background: var(--point);
+    }
+
+    .btn-primary:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 10px 25px
+        rgba(72,213,176,.25);
+    }
+
+
+    .btn-outline {
+
+      color: white;
+
+      background:
+        rgba(255,255,255,.07);
+
+      border:
+        1px solid
+        rgba(255,255,255,.20);
+    }
+
+    .btn-outline:hover {
+
+      background:
+        rgba(255,255,255,.13);
+    }
+
+
+    .hero-stats {
+
+      display: flex;
+
+      gap: 38px;
+
+      margin-top: 52px;
+    }
+
+    .stat strong {
+
+      display: block;
+
+      font-size: 25px;
+    }
+
+    .stat span {
+
+      color:
+        rgba(255,255,255,.52);
+
+      font-size: 10px;
+
+      letter-spacing: .5px;
+    }
+
+
+    /* =========================================================
+       MAIN
+       ========================================================= */
+
+    .container {
+
+      width: min(1180px, 90%);
+
+      margin: 0 auto;
+    }
+
+
+    .section {
+
+      padding: 85px 0;
+    }
+
+
+    .section-head {
+
+      margin-bottom: 25px;
+    }
+
+
+    .section-head small {
+
+      color: var(--royal);
+
+      font-weight: 800;
+
+      font-size: 11px;
+
+      letter-spacing: 1.2px;
+    }
+
+
+    .section-head h2 {
+
+      margin: 6px 0;
+
+      font-size: 31px;
+
+      letter-spacing: -1.5px;
+    }
+
+
+    .section-head p {
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin: 0;
+    }
+
+
+    /* =========================================================
+       BOARD CARDS
+       ========================================================= */
+
+    .board-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 15px;
+    }
+
+
+    .board-card {
+
+      position: relative;
+
+      overflow: hidden;
+
+      min-height: 235px;
+
+      padding: 23px;
+
+      background: white;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius:
+        var(--radius);
+
+      box-shadow:
+        var(--shadow);
+
+      transition: .25s;
+    }
+
+
+    .board-card:hover {
+
+      transform:
+        translateY(-5px);
+
+      border-color:
+        #BDD0F3;
+    }
+
+
+    .board-number {
+
+      color: #A2B0C4;
+
+      font-size: 10px;
+
+      font-weight: 800;
+    }
+
+
+    .board-icon {
+
+      width: 45px;
+      height: 45px;
+
+      display: grid;
+
+      place-items: center;
+
+      margin: 17px 0;
+
+      border-radius: 12px;
+
+      color: white;
+
+      background: var(--royal);
+
+      font-size: 12px;
+
+      font-weight: 800;
+    }
+
+
+    .board-card:nth-child(2)
+    .board-icon {
+
+      background:
+        var(--dark-2);
+    }
+
+
+    .board-card:nth-child(3)
+    .board-icon {
+
+      background:
+        #3472D9;
+    }
+
+
+    .board-card:nth-child(4)
+    .board-icon {
+
+      background:
+        #2E9D89;
+    }
+
+
+    .board-card h3 {
+
+      margin: 0 0 5px;
+
+      font-size: 16px;
+    }
+
+
+    .board-card p {
+
+      color: var(--muted);
+
+      font-size: 11px;
+
+      margin: 0;
+    }
+
+
+    .board-link {
+
+      position: absolute;
+
+      right: 20px;
+
+      bottom: 19px;
+
+      color: var(--royal);
+
+      font-size: 11px;
+
+      font-weight: 800;
+    }
+
+
+    /* =========================================================
+       PARTICIPATE
+       ========================================================= */
+
+    .participate {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 18px;
+    }
+
+
+    .panel {
+
+      padding: 28px;
+
+      border-radius:
+        var(--radius);
+
+      background: white;
+
+      border:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        var(--shadow);
+    }
+
+
+    .panel.dark {
+
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--dark),
+          #103B71
+        );
+
+      border: 0;
+    }
+
+
+    .steps {
+
+      display: grid;
+
+      gap: 17px;
+
+      margin-top: 20px;
+    }
+
+
+    .step {
+
+      display: grid;
+
+      grid-template-columns:
+        36px 1fr;
+
+      gap: 12px;
+
+      align-items: start;
+    }
+
+
+    .step-no {
+
+      width: 32px;
+      height: 32px;
+
+      display: grid;
+
+      place-items: center;
+
+      color: var(--dark);
+
+      background:
+        var(--point);
+
+      border-radius: 9px;
+
+      font-weight: 800;
+
+      font-size: 11px;
+    }
+
+
+    .step strong {
+
+      display: block;
+
+      font-size: 13px;
+
+      margin-bottom: 2px;
+    }
+
+
+    .step span {
+
+      color: var(--muted);
+
+      font-size: 11px;
+    }
+
+
+    .dark .step span {
+
+      color:
+        rgba(255,255,255,.58);
+    }
+
+
+    /* =========================================================
+       SUPABASE STATUS
+       ========================================================= */
+
+    .status-box {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 20px;
+
+      padding: 16px 18px;
+
+      border-radius: 13px;
+
+      background: #F4F7FC;
+
+      border:
+        1px solid
+        var(--line);
+
+      margin-top: 18px;
+    }
+
+
+    .status-left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 9px;
+
+      font-size: 11px;
+
+      color: var(--muted);
+    }
+
+
+    .status-indicator {
+
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #9AA8BA;
+    }
+
+
+    .status-indicator.ok {
+
+      background: var(--point);
+
+      box-shadow:
+        0 0 9px
+        rgba(72,213,176,.7);
+    }
+
+
+    /* =========================================================
+       CTA
+       ========================================================= */
+
+    .cta {
+
+      padding: 55px 45px;
+
+      color: white;
+
+      border-radius: 25px;
+
+      background:
+        radial-gradient(
+          circle at 80% 20%,
+          rgba(72,213,176,.18),
+          transparent 30%
+        ),
+
+        linear-gradient(
+          135deg,
+          var(--dark),
+          #174D8D
+        );
+
+      overflow: hidden;
+
+      position: relative;
+    }
+
+
+    .cta h2 {
+
+      max-width: 700px;
+
+      margin: 0 0 8px;
+
+      font-size: 30px;
+
+      letter-spacing: -1.5px;
+    }
+
+
+    .cta p {
+
+      max-width: 650px;
+
+      margin: 0;
+
+      color:
+        rgba(255,255,255,.64);
+
+      font-size: 12px;
+    }
+
+
+    /* =========================================================
+       AUTH MODAL
+       ========================================================= */
+
+    .modal {
+
+      position: fixed;
+
+      z-index: 300;
+
+      inset: 0;
+
+      display: none;
+
+      place-items: center;
+
+      padding: 20px;
+
+      background:
+        rgba(4,13,28,.72);
+
+      backdrop-filter:
+        blur(8px);
+    }
+
+
+    .modal.show {
+
+      display: grid;
+    }
+
+
+    .modal-card {
+
+      width:
+        min(430px, 100%);
+
+      background: white;
+
+      border-radius: 20px;
+
+      padding: 28px;
+
+      box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.25);
+
+      animation:
+        modalIn .25s ease;
+    }
+
+
+    @keyframes modalIn {
+
+      from {
+
+        opacity: 0;
+
+        transform:
+          translateY(12px)
+          scale(.98);
+      }
+
+      to {
+
+        opacity: 1;
+
+        transform:
+          translateY(0)
+          scale(1);
+      }
+
+    }
+
+
+    .modal-head {
+
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+    }
+
+
+    .modal-head h3 {
+
+      margin: 0;
+
+      font-size: 20px;
+    }
+
+
+    .close {
+
+      border: 0;
+
+      background:
+        transparent;
+
+      color:
+        var(--muted);
+
+      font-size: 22px;
+    }
+
+
+    .form-group {
+
+      margin-top: 14px;
+    }
+
+
+    .form-group label {
+
+      display: block;
+
+      margin-bottom: 5px;
+
+      color:
+        var(--muted);
+
+      font-size: 11px;
+
+      font-weight: 700;
+    }
+
+
+    .form-group input {
+
+      width: 100%;
+
+      padding: 12px 13px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 10px;
+
+      outline: none;
+
+      font-size: 12px;
+    }
+
+
+    .form-group input:focus {
+
+      border-color:
+        var(--royal);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(36,87,214,.09);
+    }
+
+
+    .auth-message {
+
+      min-height: 18px;
+
+      margin-top: 10px;
+
+      color:
+        var(--royal);
+
+      font-size: 11px;
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    footer {
+
+      padding:
+        35px 0
+        55px;
+
+      color:
+        var(--muted);
+
+      text-align:
+        center;
+
+      font-size: 10px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+      .board-grid {
+
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .participate {
+
+        grid-template-columns:
+          1fr;
+      }
+
+      .nav {
+
+        display: none;
+      }
+
+    }
+
+
+    @media (max-width: 560px) {
+
+      .hero {
+
+        min-height: 680px;
+      }
+
+      .hero h1 {
+
+        letter-spacing:
+          -2.5px;
+      }
+
+      .hero-stats {
+
+        gap: 20px;
+      }
+
+      .board-grid {
+
+        grid-template-columns:
+          1fr;
+      }
+
+      .section {
+
+        padding:
+          65px 0;
+      }
+
+      .cta {
+
+        padding:
+          35px 25px;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+
+  <header class="header">
+
+    <a class="logo" href="#home">
+
+      <span class="logo-mark">
+        HD
+      </span>
+
+      <span>
+        HD PROJECT HUB
+      </span>
+
+    </a>
+
+
+    <nav class="nav">
+
+      <a href="#boards">
+        게시판
+      </a>
+
+      <a href="#participate">
+        프로젝트 참여
+      </a>
+
+      <a href="#about">
+        프로젝트 안내
+      </a>
+
+    </nav>
+
+
+    <div class="header-user">
+
+      <span
+        class="user-dot"
+        id="userDot">
+      </span>
+
+      <span id="userStatus">
+        로그인 전
+      </span>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =========================================================
+       HERO
+       ========================================================= -->
+
+  <section
+    class="hero"
+    id="home">
+
+    <!-- 움직이는 그리드 -->
+
+    <div class="hero-grid"></div>
+
+
+    <!-- 움직이는 빛 -->
+
+    <div class="orb one"></div>
+
+    <div class="orb two"></div>
+
+
+    <div class="hero-content">
+
+      <span class="eyebrow">
+
+        <i></i>
+
+        INTERNAL PROJECT · 2026
+
+      </span>
+
+
+      <h1>
+
+        함께 만들고,<br>
+
+        <em>함께 공유하는</em><br>
+
+        프로젝트 허브
+
+      </h1>
+
+
+      <p class="hero-description">
+
+        홍보실에서 운영하는 사내 프로젝트 전용 공간입니다.
+        프로젝트 참여자들이 공지사항, 아이디어, 자료, 이미지와 결과물을
+        한 곳에서 공유하고 협업할 수 있습니다.
+
+      </p>
+
+
+      <div class="hero-buttons">
+
+        <button
+          class="btn btn-primary"
+          onclick="openAuth('signup')">
+
+          프로젝트 회원가입 →
+
+        </button>
+
+
+        <button
+          class="btn btn-outline"
+          onclick="openAuth('login')">
+
+          로그인
+
+        </button>
+
+
+        <a
+          class="btn btn-outline"
+          href="#boards">
+
+          게시판 둘러보기
+
+        </a>
+
+      </div>
+
+
+      <div class="hero-stats">
+
+        <div class="stat">
+
+          <strong>
+            30+
+          </strong>
+
+          <span>
+            PROJECT MEMBERS
+          </span>
+
+        </div>
+
+
+        <div class="stat">
+
+          <strong>
+            4
+          </strong>
+
+          <span>
+            BOARD TYPES
+          </span>
+
+        </div>
+
+
+        <div class="stat">
+
+          <strong>
+            01
+          </strong>
+
+          <span>
+            PROJECT HUB
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <main>
+
+
+    <!-- =======================================================
+         BOARD TYPES
+         ======================================================= -->
+
+    <section
+      class="section"
+      id="boards">
+
+      <div class="container">
+
+
+        <div class="section-head">
+
+          <small>
+            PROJECT COMMUNITY
+          </small>
+
+          <h2>
+            프로젝트 자료를 한 곳에서
+          </h2>
+
+          <p>
+            목적에 따라 4가지 게시판을 구분하여 운영합니다.
+          </p>
+
+        </div>
+
+
+        <div class="board-grid">
+
+
+          <!-- 공지사항 -->
+
+          <a
+            class="board-card"
+            href="#"
+            onclick="boardNotice(event)">
+
+            <span class="board-number">
+              01 · NOTICE
+            </span>
+
+            <div class="board-icon">
+              N
+            </div>
+
+            <h3>
+              공지사항
+            </h3>
+
+            <p>
+
+              프로젝트 주요 일정,
+              공지, 변경사항 등
+              모든 참여자가 확인해야 하는 정보를 공유합니다.
+
+            </p>
+
+            <span class="board-link">
+              게시판 보기 →
+            </span>
+
+          </a>
+
+
+
+          <!-- 자유게시판 -->
+
+          <a
+            class="board-card"
+            href="#"
+            onclick="boardWebzine(event)">
+
+            <span class="board-number">
+              02 · WEBZINE
+            </span>
+
+            <div class="board-icon">
+              W
+            </div>
+
+            <h3>
+              자유게시판
+            </h3>
+
+            <p>
+
+              웹진 형태로 아이디어,
+              프로젝트 이야기,
+              구성원의 의견과 콘텐츠를 자유롭게 공유합니다.
+
+            </p>
+
+            <span class="board-link">
+              게시판 보기 →
+            </span>
+
+          </a>
+
+
+
+          <!-- 자료실 -->
+
+          <a
+            class="board-card"
+            href="#"
+            onclick="boardFiles(event)">
+
+            <span class="board-number">
+              03 · FILES
+            </span>
+
+            <div class="board-icon">
+              F
+            </div>
+
+            <h3>
+              자료실
+            </h3>
+
+            <p>
+
+              프로젝트 문서,
+              참고자료,
+              발표자료 및 업무 관련 파일을 업로드합니다.
+
+            </p>
+
+            <span class="board-link">
+              자료실 보기 →
+            </span>
+
+          </a>
+
+
+
+          <!-- 갤러리 -->
+
+          <a
+            class="board-card"
+            href="#"
+            onclick="boardGallery(event)">
+
+            <span class="board-number">
+              04 · GALLERY
+            </span>
+
+            <div class="board-icon">
+              G
+            </div>
+
+            <h3>
+              갤러리
+            </h3>
+
+            <p>
+
+              프로젝트 활동사진,
+              행사, 현장 모습과
+              결과물을 이미지 중심으로 공유합니다.
+
+            </p>
+
+            <span class="board-link">
+              갤러리 보기 →
+            </span>
+
+          </a>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =======================================================
+         PROJECT PARTICIPATION
+         ======================================================= -->
+
+    <section
+      class="section"
+      id="participate">
+
+      <div class="container">
+
+
+        <div class="participate">
+
+
+          <!-- 왼쪽 -->
+
+          <div class="panel dark">
+
+            <small
+              style="
+                color:var(--point);
+                font-weight:800;
+                letter-spacing:1px;
+              ">
+
+              HOW TO PARTICIPATE
+
+            </small>
+
+
+            <h2>
+              프로젝트 참여 방법
+            </h2>
+
+
+            <p
+              style="
+                color:rgba(255,255,255,.6);
+                font-size:12px;
+              ">
+
+              사내 프로젝트 참여자는
+              간단한 회원가입 후
+              프로젝트 공간에서 자료와 의견을 공유할 수 있습니다.
+
+            </p>
+
+
+            <div class="steps">
+
+
+              <div class="step">
+
+                <span class="step-no">
+                  01
+                </span>
+
+                <div>
+
+                  <strong>
+                    회원가입
+                  </strong>
+
+                  <span>
+                    회사에서 사용하는 이메일로 가입합니다.
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="step">
+
+                <span class="step-no">
+                  02
+                </span>
+
+                <div>
+
+                  <strong>
+                    프로젝트 참여
+                  </strong>
+
+                  <span>
+                    프로젝트 안내 및 참여 정보를 확인합니다.
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="step">
+
+                <span class="step-no">
+                  03
+                </span>
+
+                <div>
+
+                  <strong>
+                    자료 공유
+                  </strong>
+
+                  <span>
+                    공지, 의견, 파일, 사진을 목적에 맞는 게시판에 등록합니다.
+                  </span>
+
+                </div>
+
+              </div>
+
+
+            </div>
+
+
+            <button
+              class="btn btn-primary"
+              style="margin-top:25px;"
+              onclick="openAuth('signup')">
+
+              지금 회원가입
+
+            </button>
+
+          </div>
+
+
+
+          <!-- 오른쪽 -->
+
+          <div
+            class="panel"
+            id="about">
+
+            <small
+              style="
+                color:var(--royal);
+                font-weight:800;
+                letter-spacing:1px;
+              ">
+
+              PROJECT GUIDE
+
+            </small>
+
+
+            <h2>
+              이 공간은 무엇인가요?
+            </h2>
+
+
+            <p
+              style="
+                color:var(--muted);
+                font-size:12px;
+              ">
+
+              이 사이트는 홍보실에서 운영하는
+              사내 프로젝트의 커뮤니케이션과
+              자료 관리를 위한 통합 대시보드입니다.
+
+            </p>
+
+
+            <!-- Supabase 상태 -->
+
+            <div class="status-box">
+
+              <div class="status-left">
+
+                <span
+                  class="status-indicator"
+                  id="supabaseIndicator">
+                </span>
+
+                <span id="supabaseStatus">
+                  Supabase 연결 확인 중...
+                </span>
+
+              </div>
+
+              <span
+                style="
+                  font-size:10px;
+                  color:var(--muted);
+                ">
+
+                DATABASE
+
+              </span>
+
+            </div>
+
+
+            <!-- 게시판 -->
+
+            <div class="status-box">
+
+              <div class="status-left">
+
+                <span
+                  class="status-indicator ok">
+                </span>
+
+                <span>
+                  프로젝트 커뮤니티
+                </span>
+
+              </div>
+
+              <strong
+                style="
+                  font-size:11px;
+                  color:var(--royal);
+                ">
+
+                4 BOARDS
+
+              </strong>
+
+            </div>
+
+
+            <!-- 멤버 -->
+
+            <div class="status-box">
+
+              <div class="status-left">
+
+                <span
+                  class="status-indicator ok">
+                </span>
+
+                <span>
+                  참여 대상
+                </span>
+
+              </div>
+
+              <strong
+                style="
+                  font-size:11px;
+                  color:var(--royal);
+                ">
+
+                30+ MEMBERS
+
+              </strong>
+
+            </div>
+
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =======================================================
+         CTA
+         ======================================================= -->
+
+    <section class="section">
+
+      <div class="container">
+
+        <div class="cta">
+
+          <h2>
+            프로젝트의 모든 과정에 함께해주세요.
+          </h2>
+
+          <p>
+
+            공지사항을 확인하고,
+            자유롭게 의견을 공유하고,
+            필요한 자료를 찾고,
+            프로젝트의 순간을 기록해주세요.
+
+          </p>
+
+
+          <div class="hero-buttons">
+
+            <button
+              class="btn btn-primary"
+              onclick="openAuth('signup')">
+
+              프로젝트 참여하기
+
+            </button>
+
+
+            <a
+              class="btn btn-outline"
+              href="#boards">
+
+              게시판 확인하기
+
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+
+  <footer>
+
+    HD Project Hub · Internal Project Workspace · 2026
+
+  </footer>
+
+
+
+  <!-- =========================================================
+       AUTH MODAL
+       ========================================================= -->
+
+  <div
+    class="modal"
+    id="authModal">
+
+    <div class="modal-card">
+
+
+      <div class="modal-head">
+
+        <h3 id="authTitle">
+          프로젝트 회원가입
+        </h3>
+
+        <button
+          class="close"
+          onclick="closeAuth()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <form id="authForm">
+
+
+        <!-- 이름 -->
+
+        <div
+          class="form-group"
+          id="nameGroup">
+
+          <label>
+            이름
+          </label>
+
+          <input
+            id="authName"
+            type="text"
+            placeholder="홍길동"
+          >
+
+        </div>
+
+
+        <!-- 이메일 -->
+
+        <div class="form-group">
+
+          <label>
+            회사 이메일
+          </label>
+
+          <input
+            id="authEmail"
+            type="email"
+            placeholder="name@company.com"
+            required
+          >
+
+        </div>
+
+
+        <!-- 비밀번호 -->
+
+        <div class="form-group">
+
+          <label>
+            비밀번호
+          </label>
+
+          <input
+            id="authPassword"
+            type="password"
+            placeholder="6자 이상"
+            minlength="6"
+            required
+          >
+
+        </div>
+
+
+        <div
+          class="auth-message"
+          id="authMessage">
+        </div>
+
+
+        <button
+          class="btn btn-primary"
+          style="
+            width:100%;
+            margin-top:7px;
+          "
+          type="submit"
+          id="authSubmit">
+
+          회원가입
+
+        </button>
+
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================================================
+       SUPABASE
+       ========================================================= -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  </script>
+
+
+  <script>
+
+    /* =========================================================
+       SUPABASE CONFIG
+       ========================================================= */
+
+    const SUPABASE_URL =
+      "https://drfkimpfuqgmldchvuvu.supabase.co";
+
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_jqI7oqmcfXpn4xLNwB6qcA_sROGNm5D";
+
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    let authMode = "signup";
+
+
+    /* =========================================================
+       SESSION CHECK
+       ========================================================= */
+
+    async function checkSession() {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.getSession();
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        updateUserUI(
+          data.session?.user || null
+        );
+
+
+        const indicator =
+          document.getElementById(
+            "supabaseIndicator"
+          );
+
+
+        const status =
+          document.getElementById(
+            "supabaseStatus"
+          );
+
+
+        indicator.classList.add("ok");
+
+        status.textContent =
+          "Supabase 연결 완료";
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+          "supabaseStatus"
+        ).textContent =
+          "Supabase 연결 확인 필요";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       USER UI
+       ========================================================= */
+
+    function updateUserUI(user) {
+
+      const dot =
+        document.getElementById(
+          "userDot"
+        );
+
+
+      const status =
+        document.getElementById(
+          "userStatus"
+        );
+
+
+      if (user) {
+
+        dot.classList.add("on");
+
+        status.textContent =
+          user.email ||
+          "로그인됨";
+
+      } else {
+
+        dot.classList.remove("on");
+
+        status.textContent =
+          "로그인 전";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       AUTH STATE
+       ========================================================= */
+
+    supabaseClient.auth.onAuthStateChange(
+      (_event, session) => {
+
+        updateUserUI(
+          session?.user || null
+        );
+
+      }
+    );
+
+
+    /* =========================================================
+       OPEN AUTH
+       ========================================================= */
+
+    function openAuth(mode) {
+
+      authMode = mode;
+
+
+      const modal =
+        document.getElementById(
+          "authModal"
+        );
+
+
+      const title =
+        document.getElementById(
+          "authTitle"
+        );
+
+
+      const submit =
+        document.getElementById(
+          "authSubmit"
+        );
+
+
+      const nameGroup =
+        document.getElementById(
+          "nameGroup"
+        );
+
+
+      const message =
+        document.getElementById(
+          "authMessage"
+        );
+
+
+      message.textContent = "";
+
+
+      if (mode === "signup") {
+
+        title.textContent =
+          "프로젝트 회원가입";
+
+        submit.textContent =
+          "회원가입";
+
+        nameGroup.style.display =
+          "block";
+
+      } else {
+
+        title.textContent =
+          "프로젝트 로그인";
+
+        submit.textContent =
+          "로그인";
+
+        nameGroup.style.display =
+          "none";
+
+      }
+
+
+      modal.classList.add("show");
+
+    }
+
+
+    /* =========================================================
+       CLOSE AUTH
+       ========================================================= */
+
+    function closeAuth() {
+
+      document
+        .getElementById("authModal")
+        .classList.remove("show");
+
+
+      document
+        .getElementById("authForm")
+        .reset();
+
+    }
+
+
+    /* 모달 외부 클릭 */
+
+    document
+      .getElementById("authModal")
+      .addEventListener(
+        "click",
+        (e) => {
+
+          if (
+            e.target.id ===
+            "authModal"
+          ) {
+
+            closeAuth();
+
+          }
+
+        }
+      );
+
+
+    /* =========================================================
+       SIGNUP / LOGIN
+       ========================================================= */
+
+    document
+      .getElementById("authForm")
+      .addEventListener(
+        "submit",
+        async (e) => {
+
+          e.preventDefault();
+
+
+          const email =
+            document
+              .getElementById(
+                "authEmail"
+              )
+              .value
+              .trim();
+
+
+          const password =
+            document
+              .getElementById(
+                "authPassword"
+              )
+              .value;
+
+
+          const name =
+            document
+              .getElementById(
+                "authName"
+              )
+              .value
+              .trim();
+
+
+          const message =
+            document
+              .getElementById(
+                "authMessage"
+              );
+
+
+          const submit =
+            document
+              .getElementById(
+                "authSubmit"
+              );
+
+
+          submit.disabled = true;
+
+          message.textContent =
+            "처리 중입니다...";
+
+
+          try {
+
+
+            /* =========================
+               SIGN UP
+               ========================= */
+
+            if (
+              authMode ===
+              "signup"
+            ) {
+
+
+              const {
+                data,
+                error
+              } =
+                await supabaseClient
+                  .auth
+                  .signUp({
+
+                    email,
+
+                    password,
+
+                    options: {
+
+                      data: {
+
+                        full_name:
+                          name
+
+                      }
+
+                    }
+
+                  });
+
+
+              if (error) {
+                throw error;
+              }
+
+
+              if (data.session) {
+
+                message.textContent =
+                  "회원가입이 완료되었습니다.";
+
+
+                setTimeout(
+                  closeAuth,
+                  800
+                );
+
+              } else {
+
+                message.textContent =
+                  "가입이 완료되었습니다. 이메일 인증 후 로그인해주세요.";
+
+              }
+
+
+            }
+
+
+            /* =========================
+               LOGIN
+               ========================= */
+
+            else {
+
+
+              const {
+                data,
+                error
+              } =
+                await supabaseClient
+                  .auth
+                  .signInWithPassword({
+
+                    email,
+
+                    password
+
+                  });
+
+
+              if (error) {
+                throw error;
+              }
+
+
+              message.textContent =
+                "로그인되었습니다.";
+
+
+              setTimeout(
+                closeAuth,
+                600
+              );
+
+            }
+
+
+          } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+              error.message ||
+              "처리 중 오류가 발생했습니다.";
+
+          } finally {
+
+            submit.disabled =
+              false;
+
+          }
+
+        }
+      );
+
+
+    /* =========================================================
+       BOARD PLACEHOLDER
+       ---------------------------------------------------------
+       실제 게시판을 연결할 때 아래 함수들을 수정합니다.
+       ========================================================= */
+
+    function boardNotice(e) {
+
+      e.preventDefault();
+
+      alert(
+        "공지사항 게시판을 준비 중입니다."
+      );
+
+    }
+
+
+    function boardWebzine(e) {
+
+      e.preventDefault();
+
+      alert(
+        "자유게시판(웹진)을 준비 중입니다."
+      );
+
+    }
+
+
+    function boardFiles(e) {
+
+      e.preventDefault();
+
+      alert(
+        "자료실을 준비 중입니다."
+      );
+
+    }
+
+
+    function boardGallery(e) {
+
+      e.preventDefault();
+
+      alert(
+        "갤러리를 준비 중입니다."
+      );
+
+    }
+
+
+    /* =========================================================
+       INITIALIZE
+       ========================================================= */
+
+    checkSession();
+
+  </script>
+
+
+</body>
+</html>
